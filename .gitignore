@@ -13,6 +13,7 @@ yarn-error.log*
 temp/
 downloads/
 cache/
+*.exe
 *.mp4
 *.webm
 *.mov

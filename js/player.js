@@ -1,10 +1,9 @@
 /**
  * 9:16 Canvas Composition Player & Audio Coordinator
- * Layout:
- * - Top Half: Speaker cropped and centered (full audio)
- * - Bottom Half: Gameplay footage (muted)
- * - Captions: Word-by-word karaoke, active word yellow
- * - Hook: 2-second top headline banner
+ * Layout Modes:
+ * - 'split': Top Half Speaker + Bottom Half Muted Gameplay
+ * - 'gameplay-only': Full 9:16 vertical gameplay (when facecam is not available or desired)
+ * - 'face-only': Full 9:16 vertical speaker/facecam
  */
 
 class ShortPlayer {
@@ -22,6 +21,7 @@ class ShortPlayer {
     this.proceduralGameplay = new ProceduralGameplayRenderer();
 
     // Composition Settings
+    this.layoutMode = 'split'; // 'split', 'gameplay-only', 'face-only'
     this.topCropX = 0.5; // 0 (left) to 1 (right)
     this.topCropY = 0.20; // 0 (top) to 1 (bottom)
     this.topZoom = 1.0;
@@ -37,13 +37,31 @@ class ShortPlayer {
 
     // Callbacks
     this.onTimeUpdate = options.onTimeUpdate || (() => {});
+    this.onLayoutChange = options.onLayoutChange || (() => {});
 
     // Animation frame loop
     this.renderLoop = this.renderLoop.bind(this);
     requestAnimationFrame(this.renderLoop);
   }
 
+  setLayoutMode(mode) {
+    if (['split', 'gameplay-only', 'face-only'].includes(mode)) {
+      this.layoutMode = mode;
+      if (mode === 'gameplay-only' || mode === 'face-only') {
+        if (this.captionsEngine && this.captionsEngine.captionYPercent === 0.5) {
+          this.captionsEngine.setCaptionY(72);
+        }
+      } else {
+        if (this.captionsEngine && this.captionsEngine.captionYPercent === 0.72) {
+          this.captionsEngine.setCaptionY(50);
+        }
+      }
+      this.onLayoutChange(this.layoutMode);
+    }
+  }
+
   setSettings(settings = {}) {
+    if (settings.layoutMode !== undefined) this.setLayoutMode(settings.layoutMode);
     if (settings.topCropX !== undefined) this.topCropX = settings.topCropX;
     if (settings.topCropY !== undefined) this.topCropY = settings.topCropY;
     if (settings.topZoom !== undefined) this.topZoom = settings.topZoom;
@@ -59,6 +77,7 @@ class ShortPlayer {
     this.topCropY = preset.topCropY !== undefined ? preset.topCropY : 0.20;
     this.topZoom = preset.topZoom !== undefined ? preset.topZoom : 1.0;
     this.splitRatio = preset.splitRatio !== undefined ? preset.splitRatio : 0.5;
+    if (preset.layoutMode) this.setLayoutMode(preset.layoutMode);
 
     if (this.captionsEngine) {
       this.captionsEngine.setWords(preset.words || []);
@@ -143,7 +162,7 @@ class ShortPlayer {
   }
 
   /**
-   * Renders a single frame onto the 1080x1920 canvas
+   * Renders a single frame onto the 1080x1920 canvas according to layoutMode
    */
   renderFrame(time) {
     const ctx = this.ctx;
@@ -152,58 +171,76 @@ class ShortPlayer {
 
     ctx.clearRect(0, 0, w, h);
 
-    const splitY = h * this.splitRatio; // E.g. 960px
+    if (this.layoutMode === 'gameplay-only') {
+      // -------------------------------------------------------------
+      // FULL SCREEN 100% GAMEPLAY SHORTS (When no facecam exists/wanted)
+      // -------------------------------------------------------------
+      ctx.save();
+      if (this.gameplayPreset === 'original' && this.speakerVideo && this.speakerVideo.readyState >= 2) {
+        this.drawCroppedVideo(ctx, this.speakerVideo, 0, 0, w, h, 0.5, 0.5, 1.0);
+      } else {
+        this.proceduralGameplay.render(ctx, w, h, this.gameplayPreset, time);
+      }
+      ctx.restore();
 
-    // -------------------------------------------------------------
-    // 1. TOP HALF: SPEAKER / FACECAM (0 to splitY)
-    // -------------------------------------------------------------
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(0, 0, w, splitY);
-    ctx.clip();
+    } else if (this.layoutMode === 'face-only') {
+      // -------------------------------------------------------------
+      // FULL SCREEN 100% SPEAKER / FACECAM SHORTS
+      // -------------------------------------------------------------
+      ctx.save();
+      if (this.speakerVideo && this.speakerVideo.readyState >= 2) {
+        this.drawCroppedVideo(ctx, this.speakerVideo, 0, 0, w, h, this.topCropX, this.topCropY, this.topZoom);
+      } else {
+        this.drawSimulatedSpeaker(ctx, 0, 0, w, h, time);
+      }
+      ctx.restore();
 
-    if (this.speakerVideo && this.speakerVideo.readyState >= 2) {
-      // Draw actual video feed cropped to 9:8 ratio
-      this.drawCroppedVideo(ctx, this.speakerVideo, 0, 0, w, splitY, this.topCropX, this.topCropY, this.topZoom);
     } else {
-      // Draw simulated studio speaker graphic
-      this.drawSimulatedSpeaker(ctx, 0, 0, w, splitY, time);
+      // -------------------------------------------------------------
+      // STANDARD SPLIT SCREEN (50/50: Speaker Top, Gameplay Bottom)
+      // -------------------------------------------------------------
+      const splitY = h * this.splitRatio; // E.g. 960px
+
+      // 1. TOP HALF: SPEAKER / FACECAM (0 to splitY)
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, 0, w, splitY);
+      ctx.clip();
+
+      if (this.speakerVideo && this.speakerVideo.readyState >= 2) {
+        this.drawCroppedVideo(ctx, this.speakerVideo, 0, 0, w, splitY, this.topCropX, this.topCropY, this.topZoom);
+      } else {
+        this.drawSimulatedSpeaker(ctx, 0, 0, w, splitY, time);
+      }
+      ctx.restore();
+
+      // 2. BOTTOM HALF: GAMEPLAY (MUTED) (splitY to h)
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, splitY, w, h - splitY);
+      ctx.clip();
+      ctx.translate(0, splitY);
+
+      if (this.gameplayPreset === 'original' && this.speakerVideo && this.speakerVideo.readyState >= 2) {
+        this.drawCroppedVideo(ctx, this.speakerVideo, 0, 0, w, h - splitY, 0.5, 0.75, 1.0);
+      } else {
+        this.proceduralGameplay.render(ctx, w, h - splitY, this.gameplayPreset, time);
+      }
+      ctx.restore();
+
+      // 3. DIVIDER SEAM
+      ctx.save();
+      ctx.fillStyle = '#FFE600';
+      ctx.shadowColor = 'rgba(255, 230, 0, 0.5)';
+      ctx.shadowBlur = 12;
+      ctx.fillRect(0, splitY - 2, w, 4);
+      ctx.restore();
     }
-    ctx.restore();
-
-    // -------------------------------------------------------------
-    // 2. BOTTOM HALF: GAMEPLAY (MUTED) (splitY to h)
-    // -------------------------------------------------------------
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(0, splitY, w, h - splitY);
-    ctx.clip();
-    ctx.translate(0, splitY);
-
-    if (this.gameplayPreset === 'original' && this.speakerVideo && this.speakerVideo.readyState >= 2) {
-      // Use stream's gameplay region
-      this.drawCroppedVideo(ctx, this.speakerVideo, 0, 0, w, h - splitY, 0.5, 0.75, 1.0);
-    } else {
-      // Render animated gameplay loop (Subway Surfers, Minecraft, GTA)
-      this.proceduralGameplay.render(ctx, w, h - splitY, this.gameplayPreset, time);
-    }
-    ctx.restore();
-
-    // -------------------------------------------------------------
-    // 3. DIVIDER SEAM
-    // -------------------------------------------------------------
-    ctx.save();
-    ctx.fillStyle = '#FFE600';
-    ctx.shadowColor = 'rgba(255, 230, 0, 0.5)';
-    ctx.shadowBlur = 12;
-    ctx.fillRect(0, splitY - 2, w, 4);
-    ctx.restore();
 
     // -------------------------------------------------------------
     // 4. HOOK & KARAOKE CAPTIONS
     // -------------------------------------------------------------
     if (this.captionsEngine) {
-      // Relative moment time for 2-second hook
       const relativeMomentTime = time - this.trimStart;
       this.captionsEngine.render(ctx, relativeMomentTime, w, h);
     }
@@ -216,7 +253,7 @@ class ShortPlayer {
     const vw = video.videoWidth || 1920;
     const vh = video.videoHeight || 1080;
 
-    const targetRatio = destW / destH; // e.g. 1080 / 960 = 1.125
+    const targetRatio = destW / destH; // e.g. 1080 / 960 = 1.125 or 1080 / 1920 = 0.5625
     let srcW, srcH;
 
     if (vw / vh > targetRatio) {
@@ -240,7 +277,6 @@ class ShortPlayer {
    * Dynamic simulated streamer graphic when testing without local video files
    */
   drawSimulatedSpeaker(ctx, x, y, w, h, time) {
-    // Studio lighting gradient background
     const bgGrad = ctx.createLinearGradient(0, 0, w, h);
     bgGrad.addColorStop(0, '#101420');
     bgGrad.addColorStop(0.5, '#1B2438');
@@ -253,7 +289,7 @@ class ShortPlayer {
     ctx.lineWidth = 10;
     ctx.strokeRect(40, 40, w - 80, h - 80);
 
-    // Sound wave visualizer in the background
+    // Sound wave visualizer in background
     const waveCount = 28;
     const waveW = (w - 160) / waveCount;
     for (let i = 0; i < waveCount; i++) {
@@ -263,12 +299,11 @@ class ShortPlayer {
       ctx.fillRect(80 + i * waveW, h * 0.45 - waveH / 2, waveW - 6, waveH);
     }
 
-    // Streamer Facecam avatar / representation
+    // Streamer Facecam avatar
     const avatarY = h * this.topCropY + (h * 0.2);
     const avatarX = w * this.topCropX;
     const avatarR = 140 * this.topZoom;
 
-    // Glowing rim
     ctx.save();
     ctx.shadowColor = '#FFE600';
     ctx.shadowBlur = 30;
@@ -281,26 +316,23 @@ class ShortPlayer {
     ctx.stroke();
     ctx.restore();
 
-    // Streamer face features
     ctx.fillStyle = '#FFFFFF';
     ctx.font = `bold ${Math.round(28 * this.topZoom)}px Montserrat, sans-serif`;
     ctx.textAlign = 'center';
-    ctx.fillText('🎙️ STREAMER MIC', avatarX, avatarY - 20);
+    ctx.fillText('🎙️ SPEAKER / FACECAM', avatarX, avatarY - 20);
 
-    // Dynamic speaking mouth indicator
     const mouthOpen = Math.abs(Math.sin(time * 12)) * 30 * this.topZoom;
     ctx.fillStyle = '#FFE600';
     ctx.beginPath();
     ctx.ellipse(avatarX, avatarY + 40, 35 * this.topZoom, mouthOpen, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Streamer Tag
     ctx.fillStyle = 'rgba(0,0,0,0.7)';
     roundRect(ctx, 40, h - 70, 240, 44, 10);
     ctx.fill();
     ctx.fillStyle = '#FFE600';
     ctx.font = 'bold 20px Montserrat, sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText('🔴 LIVE | TOP SPEAKER', 55, h - 42);
+    ctx.fillText('🔴 LIVE | SPEAKER', 55, h - 42);
   }
 }

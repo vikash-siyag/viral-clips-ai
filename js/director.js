@@ -85,6 +85,18 @@ class DirectorAI {
     const adjustments = {};
     const logs = [];
 
+    // Layout Mode adjustments (Split, Gameplay Only, Face Only)
+    if (p.includes('only gameplay') || p.includes('gameplay only') || p.includes('no face') || p.includes('no camera') || p.includes('remove face') || p.includes('just gameplay')) {
+      adjustments.layoutMode = 'gameplay-only';
+      logs.push('Switched to Full 9:16 Gameplay Shorts mode (Facecam hidden)');
+    } else if (p.includes('only face') || p.includes('face only') || p.includes('only speaker') || p.includes('speaker only') || p.includes('just face') || p.includes('no gameplay')) {
+      adjustments.layoutMode = 'face-only';
+      logs.push('Switched to Full 9:16 Facecam Shorts mode (Gameplay hidden)');
+    } else if (p.includes('split') || p.includes('both') || p.includes('half')) {
+      adjustments.layoutMode = 'split';
+      logs.push('Switched to 50/50 Split Screen mode (Speaker Top + Gameplay Bottom)');
+    }
+
     // Face / Speaker adjustments
     if (p.includes('face') || p.includes('speaker') || p.includes('head') || p.includes('camera')) {
       if (p.includes('cut off') || p.includes('top cut') || p.includes('too high') || p.includes('move down') || p.includes('shift down')) {

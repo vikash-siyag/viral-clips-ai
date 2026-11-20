@@ -37,6 +37,18 @@ function parseDirectorPrompt(prompt, currentSettings) {
   const adjustments = {};
   const logs = [];
 
+  // 0. Layout Mode adjustments
+  if (p.includes('only gameplay') || p.includes('gameplay only') || p.includes('no face') || p.includes('no camera') || p.includes('remove face') || p.includes('just gameplay')) {
+    adjustments.layoutMode = 'gameplay-only';
+    logs.push('Switched to Full 9:16 Gameplay Shorts mode (Facecam hidden)');
+  } else if (p.includes('only face') || p.includes('face only') || p.includes('only speaker') || p.includes('speaker only') || p.includes('just face') || p.includes('no gameplay')) {
+    adjustments.layoutMode = 'face-only';
+    logs.push('Switched to Full 9:16 Facecam Shorts mode (Gameplay hidden)');
+  } else if (p.includes('split') || p.includes('both') || p.includes('half')) {
+    adjustments.layoutMode = 'split';
+    logs.push('Switched to 50/50 Split Screen mode (Speaker Top + Gameplay Bottom)');
+  }
+
   // 1. Face crop vertical adjustments
   if (p.includes('face') || p.includes('speaker') || p.includes('head') || p.includes('camera')) {
     if (p.includes('cut off') || p.includes('top cut') || p.includes('too high') || p.includes('move down') || p.includes('shift down')) {
@@ -161,6 +173,13 @@ function getNextClipFilename() {
   return `clip_${padded}.mp4`;
 }
 
+// Helper to locate yt-dlp binary (local bundled or system PATH)
+function getYtDlpBinary() {
+  const local = path.join(__dirname, 'yt-dlp.exe');
+  if (fs.existsSync(local)) return `"${local}"`;
+  return 'yt-dlp';
+}
+
 // Request Handler
 const server = http.createServer((req, res) => {
   const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
@@ -182,7 +201,7 @@ const server = http.createServer((req, res) => {
     // 1. GET /api/status
     if (pathname === '/api/status' && req.method === 'GET') {
       exec('ffmpeg -version', (errFFmpeg) => {
-        exec('yt-dlp --version', (errYtDlp) => {
+        exec(`${getYtDlpBinary()} --version`, (errYtDlp) => {
           const files = fs.readdirSync(CLIPS_DIR).filter(f => !f.startsWith('.'));
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({
@@ -304,7 +323,7 @@ const server = http.createServer((req, res) => {
           }
 
           // Check if yt-dlp is available to extract stream details
-          exec(`yt-dlp --dump-json --skip-download "${url}"`, { timeout: 15000 }, (err, stdout) => {
+          exec(`${getYtDlpBinary()} --dump-json --skip-download "${url}"`, { timeout: 20000 }, (err, stdout) => {
             if (!err && stdout) {
               try {
                 const info = JSON.parse(stdout);

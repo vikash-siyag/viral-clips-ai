@@ -262,8 +262,50 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // -------------------------------------------------------------
+  // LAYOUT MODE SWITCHER (Split, Gameplay Only, Face Only)
+  // -------------------------------------------------------------
+  const layoutHintText = document.getElementById('layoutHintText');
+  const safeZoneSplitTag = document.querySelector('.split-tag');
+  const guideSplitLine = document.querySelector('.guide-split-line');
+
+  function updateLayoutModeUI(mode) {
+    player.setLayoutMode(mode);
+    document.querySelectorAll('.layout-mode-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.layout === mode);
+    });
+
+    if (mode === 'gameplay-only') {
+      if (layoutHintText) layoutHintText.textContent = '🎮 Full 9:16 Gameplay Shorts mode (Facecam hidden).';
+      if (safeZoneSplitTag) safeZoneSplitTag.textContent = '🎮 100% FULLSCREEN GAMEPLAY SHORT';
+      if (guideSplitLine) guideSplitLine.style.display = 'none';
+      document.querySelectorAll('.framing-speaker-control').forEach(el => el.style.opacity = '0.4');
+    } else if (mode === 'face-only') {
+      if (layoutHintText) layoutHintText.textContent = '🎙️ Full 9:16 Facecam Shorts mode (Gameplay hidden).';
+      if (safeZoneSplitTag) safeZoneSplitTag.textContent = '🎙️ 100% FULLSCREEN SPEAKER SHORT';
+      if (guideSplitLine) guideSplitLine.style.display = 'none';
+      document.querySelectorAll('.framing-speaker-control').forEach(el => el.style.opacity = '1');
+    } else {
+      if (layoutHintText) layoutHintText.textContent = '🔀 Split Screen: Speaker top 50% + Muted gameplay bottom 50%';
+      if (safeZoneSplitTag) safeZoneSplitTag.textContent = '50% SPLIT: SPEAKER TOP / GAMEPLAY BOTTOM';
+      if (guideSplitLine) guideSplitLine.style.display = 'flex';
+      document.querySelectorAll('.framing-speaker-control').forEach(el => el.style.opacity = '1');
+    }
+  }
+
+  document.querySelectorAll('.layout-mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.layout;
+      updateLayoutModeUI(mode);
+      directorAI.addChatMessage('system', '📐 Layout Updated', `Switched to ${mode.replace('-', ' ')} mode.`);
+    });
+  });
+
   // Helper to sync programmatic adjustments from AI Director back into UI
   function applySettingsToUI(adj) {
+    if (adj.layoutMode !== undefined) {
+      updateLayoutModeUI(adj.layoutMode);
+    }
     if (adj.topCropY !== undefined) {
       player.topCropY = adj.topCropY;
       topCropY.value = Math.round(adj.topCropY * 100);
@@ -337,27 +379,76 @@ document.addEventListener('DOMContentLoaded', () => {
   // SOURCE INGESTION & PRESETS
   // -------------------------------------------------------------
   btnFetchUrl.addEventListener('click', async () => {
-    const url = videoUrlInput.value.trim();
-    if (!url) return;
+    const rawUrl = videoUrlInput.value.trim();
+    if (!rawUrl) return;
 
-    directorAI.addChatMessage('system', '🌐 Link Ingestion', `Connecting to stream: ${url}...`);
+    btnFetchUrl.disabled = true;
+    btnFetchUrl.innerHTML = '<span>⏳ Fetching...</span>';
+    directorAI.addChatMessage('system', '🌐 Link Ingestion', `Connecting to link: ${rawUrl}...`);
 
+    // 1. Direct Video Stream (.mp4, .webm, .mov, blob)
+    if (/\.(mp4|webm|mov|m4v)(\?.*)?$/i.test(rawUrl)) {
+      player.loadSpeakerMedia(rawUrl);
+      directorAI.addChatMessage('system', '✅ Video Stream Loaded', 'Loaded direct video stream into 9:16 player!');
+      btnFetchUrl.disabled = false;
+      btnFetchUrl.innerHTML = '<span>Fetch Video</span>';
+      return;
+    }
+
+    // 2. Try Local Server with installed yt-dlp first
     try {
       const resp = await fetch('/api/parse-url', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url })
+        body: JSON.stringify({ url: rawUrl })
       });
-      const data = await resp.json();
-
-      if (data.success && data.videoUrl && data.videoUrl.startsWith('http')) {
-        player.loadSpeakerMedia(data.videoUrl);
-        directorAI.addChatMessage('system', '✅ Video Loaded', `Imported "${data.title || 'Stream'}". Top half framing active.`);
-      } else {
-        directorAI.addChatMessage('system', 'ℹ️ Direct Player', 'Streaming URL loaded in player. You can also drag-and-drop or upload video files directly.');
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.success && data.videoUrl && data.videoUrl.startsWith('http')) {
+          player.loadSpeakerMedia(data.videoUrl);
+          directorAI.addChatMessage('system', '✅ Stream Extracted', `Loaded "${data.title || 'Stream'}". Ready to trim and export!`);
+          btnFetchUrl.disabled = false;
+          btnFetchUrl.innerHTML = '<span>Fetch Video</span>';
+          return;
+        }
       }
     } catch (e) {
-      directorAI.addChatMessage('system', 'ℹ️ Ingestion Notice', 'Link processed. For live YouTube/Kick streams, install yt-dlp on the server or drop the .mp4 file.');
+      // Local server not running or static host
+    }
+
+    // 3. Fallback: Query Public Stream Extractors (Cobalt / Piped)
+    let streamFound = false;
+    const streamResolvers = [
+      'https://cobalt-api.kwiatekm.tokyo/api/json',
+      'https://api.cobalt.tools/api/json'
+    ];
+
+    for (const resolver of streamResolvers) {
+      try {
+        const cResp = await fetch(resolver, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ url: rawUrl, vQuality: '720' })
+        });
+        if (cResp.ok) {
+          const cData = await cResp.json();
+          if (cData.url) {
+            player.loadSpeakerMedia(cData.url);
+            directorAI.addChatMessage('system', '🎉 Video Stream Ready', 'Extracted stream via cloud resolver. 9:16 Short is ready for editing!');
+            streamFound = true;
+            break;
+          }
+        }
+      } catch (err) {}
+    }
+
+    btnFetchUrl.disabled = false;
+    btnFetchUrl.innerHTML = '<span>Fetch Video</span>';
+
+    if (!streamFound) {
+      directorAI.addChatMessage('system', 'ℹ️ Stream Notice', 
+        `To clip directly from YouTube/Kick links on your PC without browser CORS limits, start the local server with the installed yt-dlp (\`node server/server.js\`), or drop your downloaded video file with "Upload Video File".`
+      );
     }
   });
 

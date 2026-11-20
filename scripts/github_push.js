@@ -87,7 +87,7 @@ function getAllFiles(dir, base = '') {
         results = results.concat(getAllFiles(fullPath, relPath));
       }
     } else {
-      if (!file.endsWith('.mp4') && !file.endsWith('.webm') && !file.endsWith('.log')) {
+      if (!file.endsWith('.mp4') && !file.endsWith('.webm') && !file.endsWith('.log') && !file.endsWith('.exe')) {
         results.push({ relPath, fullPath });
       }
     }

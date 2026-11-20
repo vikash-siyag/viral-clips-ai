@@ -99,6 +99,19 @@
       <div class="preview-column">
         <div class="preview-container">
           
+          <!-- Layout Mode Switcher (Split, Gameplay Only, Face Only) -->
+          <div class="layout-mode-selector" id="layoutModeSelector">
+            <button class="layout-mode-btn active" data-layout="split" title="50% Speaker Facecam top + 50% Gameplay bottom">
+              <span class="icon">🔀</span> Split (50/50)
+            </button>
+            <button class="layout-mode-btn" data-layout="gameplay-only" title="Full 9:16 Gameplay Shorts (No Facecam)">
+              <span class="icon">🎮</span> Gameplay Only
+            </button>
+            <button class="layout-mode-btn" data-layout="face-only" title="Full 9:16 Speaker / Facecam">
+              <span class="icon">🎙️</span> Face Only
+            </button>
+          </div>
+
           <!-- Smartphone 9:16 Viewport Wrapper -->
           <div class="phone-frame">
             <div class="phone-notch"></div>
@@ -221,6 +234,16 @@
           <div class="tab-content active" id="tabFraming">
             <div class="control-grid">
               <div class="control-item">
+                <label>Short Layout Format:</label>
+                <div class="layout-mode-selector mini">
+                  <button class="layout-mode-btn active" data-layout="split">🔀 Split (50/50)</button>
+                  <button class="layout-mode-btn" data-layout="gameplay-only">🎮 Gameplay Only</button>
+                  <button class="layout-mode-btn" data-layout="face-only">🎙️ Face Only</button>
+                </div>
+                <div class="layout-hint-text" id="layoutHintText">Speaker on top 50% + Muted gameplay on bottom 50%</div>
+              </div>
+
+              <div class="control-item framing-speaker-control" id="ctrlTopCropY">
                 <div class="control-label-row">
                   <label>Top Half: Speaker Vertical Position (Y)</label>
                   <span id="lblTopCropY" class="control-val">20%</span>

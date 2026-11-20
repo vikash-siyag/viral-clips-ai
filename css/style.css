@@ -1227,3 +1227,213 @@ code {
 .modal-footer .btn {
   flex: 1;
 }
+
+
+/* ==========================================================================
+   LAYOUT MODE SELECTOR & MOBILE RESPONSIVENESS
+   ========================================================================== */
+
+.layout-mode-selector {
+  display: flex;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  gap: 4px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.layout-mode-selector.mini {
+  max-width: 100%;
+  margin-top: 4px;
+}
+
+.layout-mode-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.layout-mode-btn:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.layout-mode-btn.active {
+  background: var(--accent-yellow);
+  color: #090B10;
+  font-weight: 800;
+  box-shadow: 0 2px 10px var(--accent-yellow-glow);
+}
+
+.layout-hint-text {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+/* ==========================================================================
+   MOBILE & TABLET RESPONSIVE SYSTEM
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  .app-main {
+    padding: 16px 12px;
+    gap: 20px;
+  }
+
+  .header-container {
+    padding: 10px 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .brand-title {
+    font-size: 1.2rem;
+  }
+
+  .header-status {
+    order: 3;
+    width: 100%;
+    justify-content: space-between;
+    padding-top: 6px;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .header-actions {
+    margin-left: auto;
+  }
+
+  .studio-workspace {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .preview-container {
+    width: 100%;
+  }
+
+  .phone-frame {
+    width: 100%;
+    max-width: 340px;
+    height: auto;
+    aspect-ratio: 9 / 16;
+    border-width: 8px;
+    border-radius: 32px;
+  }
+
+  .player-controls-bar {
+    max-width: 100%;
+  }
+
+  .ingestion-card {
+    padding: 14px;
+  }
+
+  .ingestion-input-group {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .ingestion-input-group input {
+    width: 100%;
+    padding: 6px 0;
+  }
+
+  .ingestion-input-group .btn {
+    width: 100%;
+  }
+
+  .ingestion-alternatives {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .preset-pills {
+    margin-left: 0;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .director-card {
+    padding: 16px;
+  }
+
+  .tabs-nav {
+    overflow-x: auto;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab-btn {
+    white-space: nowrap;
+    padding: 8px 12px;
+  }
+
+  .director-prompts-tray {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .prompt-chip {
+    white-space: nowrap;
+  }
+
+  .director-input-wrapper {
+    flex-direction: column;
+  }
+
+  .director-input-wrapper .btn {
+    width: 100%;
+  }
+
+  .gameplay-selector-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .clips-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .phone-frame {
+    max-width: 100%;
+    border-radius: 24px;
+    border-width: 6px;
+  }
+
+  .brand-badge {
+    display: none;
+  }
+
+  .layout-mode-btn {
+    font-size: 0.75rem;
+    padding: 6px 4px;
+  }
+
+  .btn-export {
+    padding: 14px 18px;
+    font-size: 0.95rem;
+  }
+}
