@@ -1437,3 +1437,342 @@ code {
     font-size: 0.95rem;
   }
 }
+
+
+/* ==========================================================================
+   MOBILE APP NATIVE INTERFACE STYLES (CAPCUT / TIKTOK STYLE)
+   ========================================================================== */
+
+.mobile-app-shell {
+  padding-bottom: 80px; /* Space for sticky bottom bar on mobile */
+}
+
+/* Mobile App Tab Bar */
+.mobile-tab-bar {
+  display: flex;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 6px;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.mobile-tab-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.m-tab-btn {
+  flex: 1;
+  min-width: 75px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.m-tab-icon {
+  font-size: 1.2rem;
+}
+
+.m-tab-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.m-tab-btn:hover {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.m-tab-btn.active {
+  background: rgba(255, 230, 0, 0.12);
+  color: var(--accent-yellow);
+  box-shadow: 0 0 12px var(--accent-yellow-glow);
+}
+
+/* Timestamp Stepper & Duration Grid */
+.timing-presets-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.timing-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+
+.duration-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dur-preset-btn.active, .lang-btn.active {
+  background: var(--accent-yellow);
+  color: #090B10;
+  font-weight: 800;
+  border-color: var(--accent-yellow);
+}
+
+.timestamp-stepper-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 600px) {
+  .timestamp-stepper-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.timestamp-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ts-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.ts-input-stepper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.input-time-box {
+  flex: 1;
+  background: #151A26;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--accent-yellow);
+  font-family: 'Consolas', monospace;
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-align: center;
+  padding: 8px 4px;
+  outline: none;
+}
+
+.input-time-box:focus {
+  border-color: var(--accent-yellow);
+}
+
+.ts-btn {
+  font-family: 'Consolas', monospace;
+  font-weight: 700;
+  padding: 8px 6px;
+  min-width: 34px;
+}
+
+.timestamp-helper-info {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  background: rgba(255, 230, 0, 0.05);
+  border: 1px dashed rgba(255, 230, 0, 0.2);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+}
+
+/* Focus Modes Cards Grid */
+.focus-modes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .focus-modes-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.focus-card {
+  background: var(--bg-input);
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.focus-card:hover {
+  border-color: rgba(255, 230, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.focus-card.active {
+  border-color: var(--accent-yellow);
+  background: rgba(255, 230, 0, 0.08);
+  box-shadow: 0 4px 18px var(--accent-yellow-glow);
+}
+
+.focus-card-icon {
+  font-size: 1.8rem;
+}
+
+.focus-card-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.focus-card.active .focus-card-title {
+  color: var(--accent-yellow);
+}
+
+.focus-card-desc {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  line-height: 1.35;
+}
+
+.framing-speaker-controls-card, .gameplay-select-wrapper {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.subcard-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--accent-yellow);
+}
+
+/* Caption Script Textarea & Multi-Language */
+.caption-lang-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.caption-editor-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.caption-textarea {
+  width: 100%;
+  background: #141924;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  padding: 10px;
+  font-family: 'Noto Sans Devanagari', 'Montserrat', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  resize: vertical;
+  outline: none;
+}
+
+.caption-textarea:focus {
+  border-color: var(--accent-yellow);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.clip-duration-tag {
+  background: rgba(255, 230, 0, 0.15);
+  color: var(--accent-yellow);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-left: auto;
+  font-family: 'Consolas', monospace;
+}
+
+/* Mobile Sticky Bottom Action Bar */
+.mobile-sticky-action-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(14, 18, 27, 0.96);
+  backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border-subtle);
+  padding: 10px 16px;
+  z-index: 999;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.6);
+}
+
+@media (max-width: 900px) {
+  .mobile-sticky-action-bar {
+    display: flex;
+  }
+}
+
+.mobile-sticky-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.mobile-dur-text {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--accent-yellow);
+  font-family: 'Consolas', monospace;
+}
+
+.mobile-mode-text {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.btn-mobile-export {
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  font-weight: 800;
+}

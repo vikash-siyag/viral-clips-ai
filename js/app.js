@@ -1,5 +1,6 @@
 /**
  * Main Web Application Controller for ViralClips AI
+ * Full Mobile-Native App Experience with Hinglish Captions, YouTube Timestamps & Layout Focus
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -12,33 +13,53 @@ document.addEventListener('DOMContentLoaded', () => {
   const playIcon = document.getElementById('playIcon');
   const currentTimeText = document.getElementById('currentTimeText');
   const totalDurationText = document.getElementById('totalDurationText');
-  const trimStartInput = document.getElementById('trimStart');
-  const trimEndInput = document.getElementById('trimEnd');
+  const clipDurationTag = document.getElementById('clipDurationTag');
+
+  // Mobile Elements
+  const mobileTabBar = document.getElementById('mobileTabBar');
+  const btnMobilePlayToggle = document.getElementById('btnMobilePlayToggle');
+  const mobilePlayIcon = document.getElementById('mobilePlayIcon');
+  const mobileDurText = document.getElementById('mobileDurText');
+  const mobileModeText = document.getElementById('mobileModeText');
+  const btnMobileStickyExport = document.getElementById('btnMobileStickyExport');
+  const btnQuickExportTop = document.getElementById('btnQuickExportTop');
+  const topClipName = document.getElementById('topClipName');
+
+  // Timestamps & Duration Controls
+  const timeFormattedStart = document.getElementById('timeFormattedStart');
+  const timeFormattedEnd = document.getElementById('timeFormattedEnd');
+  const sliderTrimStart = document.getElementById('sliderTrimStart');
+  const sliderTrimEnd = document.getElementById('sliderTrimEnd');
+  const trimStartHidden = document.getElementById('trimStart');
+  const trimEndHidden = document.getElementById('trimEnd');
   const momentTrimBar = document.getElementById('momentTrimBar');
 
-  // Sliders & Controls
+  // Focus & Layout Controls
   const topCropY = document.getElementById('topCropY');
   const topCropX = document.getElementById('topCropX');
   const topZoom = document.getElementById('topZoom');
   const splitRatio = document.getElementById('splitRatio');
-  const captionOffset = document.getElementById('captionOffset');
-  const fontSize = document.getElementById('fontSize');
-  const captionY = document.getElementById('captionY');
-  const hookTextInput = document.getElementById('hookTextInput');
-
-  // Labels
   const lblTopCropY = document.getElementById('lblTopCropY');
   const lblTopCropX = document.getElementById('lblTopCropX');
   const lblTopZoom = document.getElementById('lblTopZoom');
   const lblSplitRatio = document.getElementById('lblSplitRatio');
-  const lblCaptionOffset = document.getElementById('lblCaptionOffset');
-  const lblFontSize = document.getElementById('lblFontSize');
-  const lblCaptionY = document.getElementById('lblCaptionY');
+  const safeZoneSplitTag = document.querySelector('.split-tag');
+  const guideSplitLine = document.querySelector('.guide-split-line');
 
-  // Director Chat & Form
-  const directorChatLogs = document.getElementById('directorChatLogs');
-  const directorPromptForm = document.getElementById('directorPromptForm');
-  const directorPromptInput = document.getElementById('directorPromptInput');
+  // Captions & Script Editor
+  const captionScriptTextarea = document.getElementById('captionScriptTextarea');
+  const btnApplyCustomScript = document.getElementById('btnApplyCustomScript');
+  const btnAutoGenerateScript = document.getElementById('btnAutoGenerateScript');
+  const captionOffset = document.getElementById('captionOffset');
+  const lblCaptionOffset = document.getElementById('lblCaptionOffset');
+  const hookTextInput = document.getElementById('hookTextInput');
+  const activeColorPreview = document.getElementById('activeColorPreview');
+
+  // Ingestion & URL
+  const videoUrlInput = document.getElementById('videoUrlInput');
+  const btnFetchUrl = document.getElementById('btnFetchUrl');
+  const localVideoUpload = document.getElementById('localVideoUpload');
+  const btnDemoStream = document.getElementById('btnDemoStream');
 
   // Export & Gallery
   const btnExportClip = document.getElementById('btnExportClip');
@@ -46,8 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const exportProgressBar = document.getElementById('exportProgressBar');
   const exportProgressText = document.getElementById('exportProgressText');
   const nextClipNameBadge = document.getElementById('nextClipNameBadge');
+  const exportSubFilename = document.getElementById('exportSubFilename');
   const clipsGrid = document.getElementById('clipsGrid');
-  const clipsCountBadge = document.getElementById('clipsCountBadge');
   const galleryCountTag = document.getElementById('galleryCountTag');
   const btnRefreshClips = document.getElementById('btnRefreshClips');
 
@@ -59,21 +80,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnDownloadClipDirect = document.getElementById('btnDownloadClipDirect');
   const btnDirectorReEdit = document.getElementById('btnDirectorReEdit');
 
-  // Ingestion
-  const videoUrlInput = document.getElementById('videoUrlInput');
-  const btnFetchUrl = document.getElementById('btnFetchUrl');
-  const localVideoUpload = document.getElementById('localVideoUpload');
-  const btnDemoStream = document.getElementById('btnDemoStream');
+  // Director Chat
+  const directorChatLogs = document.getElementById('directorChatLogs');
+  const directorPromptForm = document.getElementById('directorPromptForm');
+  const directorPromptInput = document.getElementById('directorPromptInput');
 
-  // 1. Initialize Captions Engine
+  // 1. Initialize Captions Engine with Hinglish Default
   const captionsEngine = new ViralCaptionsEngine({
-    highlightColor: '#FFE600', // Yellow as requested
+    highlightColor: '#FFE600',
     inactiveColor: '#FFFFFF',
-    fontSize: 42,
+    fontSize: 48,
     captionYPercent: 0.50,
     captionOffset: 0.0,
-    hookText: 'HE ACTUALLY SAID THIS?! 😱'
+    hookText: 'WAIT FOR IT... 💀',
+    language: 'hinglish'
   });
+
+  // Populate textarea with default Hinglish script
+  captionScriptTextarea.value = "Bhai ye kya bol diya tune sach me aisa hoga kya dekho aage kya hua";
 
   // 2. Initialize 9:16 Short Player
   const player = new ShortPlayer({
@@ -85,6 +109,9 @@ document.addEventListener('DOMContentLoaded', () => {
       timelineScrubber.value = time;
       currentTimeText.textContent = formatTime(time);
       totalDurationText.textContent = formatTime(dur);
+    },
+    onLayoutChange: (mode) => {
+      updateLayoutFocusUI(mode);
     }
   });
 
@@ -105,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const directorAI = new DirectorAI({
     chatContainer: directorChatLogs,
     getCurrentSettings: () => ({
+      layoutMode: player.layoutMode,
       topCropY: player.topCropY,
       topCropX: player.topCropX,
       topZoom: player.topZoom,
@@ -123,137 +151,223 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Load Initial Preset
+  // Initial Load with Hinglish Preset
   player.loadPreset(STREAM_PRESETS['tutorial-demo']);
-  updateTrimUI();
+  updateTrimDisplays();
 
   // -------------------------------------------------------------
-  // PLAYBACK CONTROLS
+  // MOBILE NAVIGATION TABS (CapCut Mobile App Style)
   // -------------------------------------------------------------
+  document.querySelectorAll('.m-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.m-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const targetId = btn.dataset.section;
+      const targetCard = document.getElementById(targetId);
+      if (targetCard) {
+        // On mobile, scroll smoothly to the tapped section
+        targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
+  });
+
+  // -------------------------------------------------------------
+  // PLAYBACK COORDINATION
+  // -------------------------------------------------------------
+  function syncPlayPause(isPlaying) {
+    playIcon.textContent = isPlaying ? '⏸' : '▶';
+    if (mobilePlayIcon) mobilePlayIcon.textContent = isPlaying ? '⏸' : '▶';
+  }
+
   btnPlayPause.addEventListener('click', () => {
     const isPlaying = player.togglePlay();
-    playIcon.textContent = isPlaying ? '⏸' : '▶';
+    syncPlayPause(isPlaying);
   });
+
+  if (btnMobilePlayToggle) {
+    btnMobilePlayToggle.addEventListener('click', () => {
+      const isPlaying = player.togglePlay();
+      syncPlayPause(isPlaying);
+    });
+  }
 
   timelineScrubber.addEventListener('input', (e) => {
     player.seekTo(parseFloat(e.target.value));
   });
 
-  // Trim Moment Range
-  trimStartInput.addEventListener('change', () => {
-    player.trimStart = parseFloat(trimStartInput.value) || 0;
-    updateTrimUI();
-    player.seekTo(player.trimStart);
-  });
-
-  trimEndInput.addEventListener('change', () => {
-    player.trimEnd = parseFloat(trimEndInput.value) || player.duration;
-    updateTrimUI();
-  });
-
-  function updateTrimUI() {
-    timelineScrubber.max = player.duration;
-    trimStartInput.value = player.trimStart.toFixed(1);
-    trimEndInput.value = player.trimEnd.toFixed(1);
-
-    const leftPct = (player.trimStart / player.duration) * 100;
-    const widthPct = ((player.trimEnd - player.trimStart) / player.duration) * 100;
-    momentTrimBar.style.left = `${leftPct}%`;
-    momentTrimBar.style.width = `${widthPct}%`;
+  // -------------------------------------------------------------
+  // YOUTUBE TIMESTAMP PARSER & CLIP CUTTER
+  // -------------------------------------------------------------
+  function parseTimestampToSeconds(str) {
+    if (!str) return 0;
+    const clean = str.trim();
+    // Case 1: MM:SS or HH:MM:SS
+    if (clean.includes(':')) {
+      const parts = clean.split(':').map(Number);
+      if (parts.length === 2) return parts[0] * 60 + parts[1];
+      if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    }
+    // Case 2: 1m30s or 90s
+    let total = 0;
+    const mMatch = clean.match(/(\d+)m/);
+    const sMatch = clean.match(/(\d+(\.\d+)?)s?/);
+    if (mMatch) total += parseInt(mMatch[1], 10) * 60;
+    if (sMatch && !mMatch) total = parseFloat(sMatch[1]);
+    else if (sMatch && mMatch) total += parseFloat(sMatch[1]);
+    return total || 0;
   }
 
-  // -------------------------------------------------------------
-  // TABS & SLIDERS SYNCHRONIZATION
-  // -------------------------------------------------------------
-  document.querySelectorAll('.tab-btn').forEach(btn => {
+  function setClipTimes(startSec, endSec) {
+    const maxDur = Math.max(30.0, player.duration || 60.0);
+    const s = Math.max(0, Math.min(maxDur - 1, startSec));
+    const e = Math.max(s + 1, Math.min(maxDur, endSec));
+
+    player.trimStart = Number(s.toFixed(1));
+    player.trimEnd = Number(e.toFixed(1));
+
+    updateTrimDisplays();
+  }
+
+  function updateTrimDisplays() {
+    const s = player.trimStart;
+    const e = player.trimEnd;
+    const dur = Math.max(0, e - s);
+
+    timeFormattedStart.value = formatTime(s);
+    timeFormattedEnd.value = formatTime(e);
+    trimStartHidden.value = s;
+    trimEndHidden.value = e;
+
+    sliderTrimStart.max = player.duration || 60;
+    sliderTrimEnd.max = player.duration || 60;
+    sliderTrimStart.value = s;
+    sliderTrimEnd.value = e;
+
+    timelineScrubber.max = player.duration || 60;
+
+    const leftPct = (s / (player.duration || 60)) * 100;
+    const widthPct = ((e - s) / (player.duration || 60)) * 100;
+    momentTrimBar.style.left = `${leftPct}%`;
+    momentTrimBar.style.width = `${widthPct}%`;
+
+    const durText = `${dur.toFixed(1)}s Short`;
+    clipDurationTag.textContent = durText;
+    if (mobileDurText) mobileDurText.textContent = durText;
+  }
+
+  // Stepper Buttons (+1s, -1s, +5s, -5s)
+  document.getElementById('btnStartMinus5').addEventListener('click', () => setClipTimes(player.trimStart - 5, player.trimEnd));
+  document.getElementById('btnStartMinus1').addEventListener('click', () => setClipTimes(player.trimStart - 1, player.trimEnd));
+  document.getElementById('btnStartPlus1').addEventListener('click', () => setClipTimes(player.trimStart + 1, player.trimEnd));
+  document.getElementById('btnStartPlus5').addEventListener('click', () => setClipTimes(player.trimStart + 5, player.trimEnd));
+
+  document.getElementById('btnEndMinus5').addEventListener('click', () => setClipTimes(player.trimStart, player.trimEnd - 5));
+  document.getElementById('btnEndMinus1').addEventListener('click', () => setClipTimes(player.trimStart, player.trimEnd - 1));
+  document.getElementById('btnEndPlus1').addEventListener('click', () => setClipTimes(player.trimStart, player.trimEnd + 1));
+  document.getElementById('btnEndPlus5').addEventListener('click', () => setClipTimes(player.trimStart, player.trimEnd + 5));
+
+  timeFormattedStart.addEventListener('change', () => {
+    const sec = parseTimestampToSeconds(timeFormattedStart.value);
+    setClipTimes(sec, player.trimEnd);
+  });
+
+  timeFormattedEnd.addEventListener('change', () => {
+    const sec = parseTimestampToSeconds(timeFormattedEnd.value);
+    setClipTimes(player.trimStart, sec);
+  });
+
+  sliderTrimStart.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value);
+    setClipTimes(val, Math.max(val + 3, player.trimEnd));
+  });
+
+  sliderTrimEnd.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value);
+    setClipTimes(Math.min(val - 3, player.trimStart), val);
+  });
+
+  // Duration Presets (15s, 30s, 45s, 60s)
+  document.querySelectorAll('.dur-preset-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.dur-preset-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      const target = document.getElementById(btn.dataset.tab);
-      if (target) target.classList.add('active');
+      const targetDuration = parseFloat(btn.dataset.dur);
+      setClipTimes(player.trimStart, player.trimStart + targetDuration);
+      directorAI.addChatMessage('system', '⏱️ Clip Duration', `Set moment duration to ${targetDuration}s.`);
     });
   });
 
-  // Framing Sliders
+  // -------------------------------------------------------------
+  // FOCUS & LAYOUT MODES (Only Face, Only Gameplay, Split 50/50)
+  // -------------------------------------------------------------
+  function updateLayoutFocusUI(mode) {
+    player.setLayoutMode(mode);
+
+    // Update top pills & big focus cards
+    document.querySelectorAll('.layout-mode-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.layout === mode);
+    });
+    document.querySelectorAll('.focus-card').forEach(c => {
+      c.classList.toggle('active', c.dataset.focus === mode);
+    });
+
+    const splitRatioItem = document.getElementById('splitRatioItem');
+    const vpFormatBadge = document.getElementById('vpFormatBadge');
+
+    if (mode === 'gameplay-only') {
+      if (safeZoneSplitTag) safeZoneSplitTag.textContent = '🎮 100% FULLSCREEN GAMEPLAY';
+      if (guideSplitLine) guideSplitLine.style.display = 'none';
+      if (splitRatioItem) splitRatioItem.style.display = 'none';
+      if (vpFormatBadge) vpFormatBadge.textContent = 'GAMEPLAY ONLY SHORT';
+      if (mobileModeText) mobileModeText.textContent = 'Gameplay Only';
+      document.querySelectorAll('.framing-speaker-controls-card').forEach(el => el.style.opacity = '0.5');
+    } else if (mode === 'face-only') {
+      if (safeZoneSplitTag) safeZoneSplitTag.textContent = '🎙️ 100% FULLSCREEN SPEAKER';
+      if (guideSplitLine) guideSplitLine.style.display = 'none';
+      if (splitRatioItem) splitRatioItem.style.display = 'none';
+      if (vpFormatBadge) vpFormatBadge.textContent = 'FACECAM ONLY SHORT';
+      if (mobileModeText) mobileModeText.textContent = 'Facecam Only';
+      document.querySelectorAll('.framing-speaker-controls-card').forEach(el => el.style.opacity = '1');
+    } else {
+      if (safeZoneSplitTag) safeZoneSplitTag.textContent = '50% SPLIT: SPEAKER TOP / GAMEPLAY BOTTOM';
+      if (guideSplitLine) guideSplitLine.style.display = 'flex';
+      if (splitRatioItem) splitRatioItem.style.display = 'block';
+      if (vpFormatBadge) vpFormatBadge.textContent = '9:16 VERTICAL SHORT';
+      if (mobileModeText) mobileModeText.textContent = 'Split 50/50';
+      document.querySelectorAll('.framing-speaker-controls-card').forEach(el => el.style.opacity = '1');
+    }
+  }
+
+  document.querySelectorAll('.layout-mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => updateLayoutFocusUI(btn.dataset.layout));
+  });
+
+  document.querySelectorAll('.focus-card').forEach(card => {
+    card.addEventListener('click', () => updateLayoutFocusUI(card.dataset.focus));
+  });
+
+  // Face Framing Sliders
   topCropY.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value, 10) / 100;
-    player.topCropY = val;
+    player.topCropY = parseInt(e.target.value, 10) / 100;
     lblTopCropY.textContent = `${e.target.value}%`;
   });
 
   topCropX.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value, 10) / 100;
-    player.topCropX = val;
+    player.topCropX = parseInt(e.target.value, 10) / 100;
     lblTopCropX.textContent = `${e.target.value}%`;
   });
 
   topZoom.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value, 10) / 100;
-    player.topZoom = val;
-    lblTopZoom.textContent = `${val.toFixed(1)}x`;
+    player.topZoom = parseInt(e.target.value, 10) / 100;
+    lblTopZoom.textContent = `${player.topZoom.toFixed(1)}x`;
   });
 
   splitRatio.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value, 10) / 100;
-    player.splitRatio = val;
+    player.splitRatio = parseInt(e.target.value, 10) / 100;
     lblSplitRatio.textContent = `${e.target.value} / ${100 - parseInt(e.target.value, 10)}`;
   });
 
-  // Caption Sliders
-  captionOffset.addEventListener('input', (e) => {
-    const val = parseFloat(e.target.value);
-    captionsEngine.setOffset(val);
-    lblCaptionOffset.textContent = (val >= 0 ? `+${val.toFixed(2)}s` : `${val.toFixed(2)}s`);
-  });
-
-  document.getElementById('btnOffsetMinus02').addEventListener('click', () => {
-    const cur = parseFloat(captionOffset.value) - 0.2;
-    captionOffset.value = cur.toFixed(2);
-    captionOffset.dispatchEvent(new Event('input'));
-  });
-
-  document.getElementById('btnOffsetPlus02').addEventListener('click', () => {
-    const cur = parseFloat(captionOffset.value) + 0.2;
-    captionOffset.value = cur.toFixed(2);
-    captionOffset.dispatchEvent(new Event('input'));
-  });
-
-  fontSize.addEventListener('input', (e) => {
-    captionsEngine.setFontSize(e.target.value);
-    lblFontSize.textContent = `${e.target.value}px`;
-  });
-
-  captionY.addEventListener('input', (e) => {
-    captionsEngine.setCaptionY(e.target.value);
-    lblCaptionY.textContent = `${e.target.value}%`;
-  });
-
-  // Color Swatches
-  document.querySelectorAll('.color-swatch').forEach(swatch => {
-    swatch.addEventListener('click', () => {
-      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-      swatch.classList.add('active');
-      const color = swatch.dataset.color;
-      captionsEngine.setHighlightColor(color);
-      document.getElementById('activeColorPreview').style.background = color;
-    });
-  });
-
-  // Hook Text
-  hookTextInput.addEventListener('input', (e) => {
-    captionsEngine.setHookText(e.target.value);
-  });
-
-  document.querySelectorAll('[data-hook]').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const text = chip.dataset.hook;
-      hookTextInput.value = text;
-      captionsEngine.setHookText(text);
-    });
-  });
-
-  // Gameplay Selector
   document.querySelectorAll('.gameplay-card').forEach(card => {
     card.addEventListener('click', () => {
       document.querySelectorAll('.gameplay-card').forEach(c => c.classList.remove('active'));
@@ -263,49 +377,207 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // -------------------------------------------------------------
-  // LAYOUT MODE SWITCHER (Split, Gameplay Only, Face Only)
+  // MULTI-LANGUAGE HINGLISH CAPTIONS ENGINE
   // -------------------------------------------------------------
-  const layoutHintText = document.getElementById('layoutHintText');
-  const safeZoneSplitTag = document.querySelector('.split-tag');
-  const guideSplitLine = document.querySelector('.guide-split-line');
-
-  function updateLayoutModeUI(mode) {
-    player.setLayoutMode(mode);
-    document.querySelectorAll('.layout-mode-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.layout === mode);
-    });
-
-    if (mode === 'gameplay-only') {
-      if (layoutHintText) layoutHintText.textContent = '🎮 Full 9:16 Gameplay Shorts mode (Facecam hidden).';
-      if (safeZoneSplitTag) safeZoneSplitTag.textContent = '🎮 100% FULLSCREEN GAMEPLAY SHORT';
-      if (guideSplitLine) guideSplitLine.style.display = 'none';
-      document.querySelectorAll('.framing-speaker-control').forEach(el => el.style.opacity = '0.4');
-    } else if (mode === 'face-only') {
-      if (layoutHintText) layoutHintText.textContent = '🎙️ Full 9:16 Facecam Shorts mode (Gameplay hidden).';
-      if (safeZoneSplitTag) safeZoneSplitTag.textContent = '🎙️ 100% FULLSCREEN SPEAKER SHORT';
-      if (guideSplitLine) guideSplitLine.style.display = 'none';
-      document.querySelectorAll('.framing-speaker-control').forEach(el => el.style.opacity = '1');
-    } else {
-      if (layoutHintText) layoutHintText.textContent = '🔀 Split Screen: Speaker top 50% + Muted gameplay bottom 50%';
-      if (safeZoneSplitTag) safeZoneSplitTag.textContent = '50% SPLIT: SPEAKER TOP / GAMEPLAY BOTTOM';
-      if (guideSplitLine) guideSplitLine.style.display = 'flex';
-      document.querySelectorAll('.framing-speaker-control').forEach(el => el.style.opacity = '1');
-    }
-  }
-
-  document.querySelectorAll('.layout-mode-btn').forEach(btn => {
+  document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const mode = btn.dataset.layout;
-      updateLayoutModeUI(mode);
-      directorAI.addChatMessage('system', '📐 Layout Updated', `Switched to ${mode.replace('-', ' ')} mode.`);
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const lang = btn.dataset.lang;
+      captionsEngine.setLanguage(lang);
+
+      if (lang === 'hindi') {
+        captionScriptTextarea.value = "भाई ये क्या बोल दिया तूने सच में ऐसा हो सकता है क्या देखो आगे क्या हुआ";
+      } else if (lang === 'hinglish') {
+        captionScriptTextarea.value = "Bhai ye kya bol diya tune sach me aisa hoga kya dekho aage kya hua";
+      } else {
+        captionScriptTextarea.value = "Wait look at what just happened on the screen right now watch this";
+      }
+
+      captionsEngine.generateFromText(captionScriptTextarea.value, player.trimStart + 0.3, player.trimEnd);
+      directorAI.addChatMessage('system', '🇮🇳 Language Selected', `Switched caption engine to ${lang.toUpperCase()}.`);
     });
   });
 
-  // Helper to sync programmatic adjustments from AI Director back into UI
-  function applySettingsToUI(adj) {
-    if (adj.layoutMode !== undefined) {
-      updateLayoutModeUI(adj.layoutMode);
+  // Apply User's Custom Typed Script to Karaoke Engine
+  btnApplyCustomScript.addEventListener('click', () => {
+    const text = captionScriptTextarea.value.trim();
+    if (!text) return;
+
+    captionsEngine.generateFromText(text, player.trimStart + 0.3, player.trimEnd);
+    directorAI.addChatMessage('system', '✨ Captions Applied', `Generated word-by-word karaoke captions for: "${text.substring(0, 35)}..."`);
+    player.seekTo(player.trimStart);
+  });
+
+  btnAutoGenerateScript.addEventListener('click', () => {
+    captionsEngine.generateDefaultCaptions(captionsEngine.language || 'hinglish');
+    captionScriptTextarea.value = captionsEngine.words.map(w => w.word).join(' ');
+    directorAI.addChatMessage('system', '⚡ Auto-Transcribe', 'Generated synchronized karaoke captions for this moment.');
+  });
+
+  captionOffset.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value);
+    captionsEngine.setOffset(val);
+    lblCaptionOffset.textContent = (val >= 0 ? `+${val.toFixed(2)}s` : `${val.toFixed(2)}s`);
+  });
+
+  document.getElementById('btnOffsetMinus02').addEventListener('click', () => {
+    captionOffset.value = (parseFloat(captionOffset.value) - 0.2).toFixed(2);
+    captionOffset.dispatchEvent(new Event('input'));
+  });
+
+  document.getElementById('btnOffsetPlus02').addEventListener('click', () => {
+    captionOffset.value = (parseFloat(captionOffset.value) + 0.2).toFixed(2);
+    captionOffset.dispatchEvent(new Event('input'));
+  });
+
+  document.querySelectorAll('.color-swatch').forEach(swatch => {
+    swatch.addEventListener('click', () => {
+      document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+      swatch.classList.add('active');
+      const color = swatch.dataset.color;
+      captionsEngine.setHighlightColor(color);
+      activeColorPreview.style.background = color;
+    });
+  });
+
+  hookTextInput.addEventListener('input', (e) => captionsEngine.setHookText(e.target.value));
+
+  document.querySelectorAll('[data-hook]').forEach(chip => {
+    chip.addEventListener('click', () => {
+      hookTextInput.value = chip.dataset.hook;
+      captionsEngine.setHookText(chip.dataset.hook);
+    });
+  });
+
+  // -------------------------------------------------------------
+  // SOURCE INGESTION (Supports YouTube ?t= timestamp parsing)
+  // -------------------------------------------------------------
+  btnFetchUrl.addEventListener('click', async () => {
+    const rawUrl = videoUrlInput.value.trim();
+    if (!rawUrl) return;
+
+    btnFetchUrl.disabled = true;
+    btnFetchUrl.innerHTML = '<span>⏳ Loading...</span>';
+
+    // Check if YouTube timestamp exists in URL (e.g. &t=1m30s or ?t=90)
+    const tParam = rawUrl.match(/[?&#]t=([^&]+)/);
+    if (tParam) {
+      const parsedStart = parseTimestampToSeconds(tParam[1]);
+      setClipTimes(parsedStart, parsedStart + 15.0);
+      directorAI.addChatMessage('system', '⏱️ Timestamp Detected', `Set start timestamp to ${formatTime(parsedStart)} from URL.`);
     }
+
+    // Direct Video Stream (.mp4, .webm, .mov)
+    if (/\.(mp4|webm|mov|m4v)(\?.*)?$/i.test(rawUrl)) {
+      player.loadSpeakerMedia(rawUrl);
+      directorAI.addChatMessage('system', '✅ Video Stream Ready', 'Direct stream loaded into 9:16 player.');
+      btnFetchUrl.disabled = false;
+      btnFetchUrl.innerHTML = '<span>Fetch Video</span>';
+      return;
+    }
+
+    // Local server with yt-dlp check
+    try {
+      const resp = await fetch('/api/parse-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: rawUrl })
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.success && data.videoUrl && data.videoUrl.startsWith('http')) {
+          player.loadSpeakerMedia(data.videoUrl);
+          directorAI.addChatMessage('system', '✅ Stream Extracted', `Loaded "${data.title || 'Stream'}".`);
+          btnFetchUrl.disabled = false;
+          btnFetchUrl.innerHTML = '<span>Fetch Video</span>';
+          return;
+        }
+      }
+    } catch (e) {}
+
+    // Cloud Stream Extraction
+    const streamResolvers = [
+      'https://cobalt-api.kwiatekm.tokyo/api/json',
+      'https://api.cobalt.tools/api/json'
+    ];
+    let found = false;
+
+    for (const res of streamResolvers) {
+      try {
+        const cResp = await fetch(res, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: rawUrl, vQuality: '720' })
+        });
+        if (cResp.ok) {
+          const cData = await cResp.json();
+          if (cData.url) {
+            player.loadSpeakerMedia(cData.url);
+            directorAI.addChatMessage('system', '🎉 Stream Connected', 'Video loaded into 9:16 studio!');
+            found = true;
+            break;
+          }
+        }
+      } catch (err) {}
+    }
+
+    btnFetchUrl.disabled = false;
+    btnFetchUrl.innerHTML = '<span>Fetch Video</span>';
+
+    if (!found) {
+      directorAI.addChatMessage('system', 'ℹ️ Link Ingested', 
+        `To bypass YouTube browser restrictions on your PC, run \`node server/server.js\` where your yt-dlp is installed, or drop your downloaded video with "Upload from Phone/PC".`
+      );
+    }
+  });
+
+  localVideoUpload.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      player.loadSpeakerMedia(file);
+      // Auto-generate captions so they never disappear
+      captionsEngine.generateDefaultCaptions(captionsEngine.language || 'hinglish');
+      directorAI.addChatMessage('system', '📁 Video Loaded', `Loaded ${file.name}. Hinglish captions active.`);
+    }
+  });
+
+  btnDemoStream.addEventListener('click', () => {
+    player.loadPreset(STREAM_PRESETS['tutorial-demo']);
+    updateTrimDisplays();
+    directorAI.addChatMessage('system', '⚡ Demo Ready', 'Loaded demo with Hinglish captions and 9:16 layout.');
+  });
+
+  document.querySelectorAll('.preset-pills .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.preset-pills .chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const preset = STREAM_PRESETS[chip.dataset.preset];
+      if (preset) {
+        player.loadPreset(preset);
+        updateTrimDisplays();
+      }
+    });
+  });
+
+  // -------------------------------------------------------------
+  // AI DIRECTOR & PROMPT FORM
+  // -------------------------------------------------------------
+  directorPromptForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const prompt = directorPromptInput.value.trim();
+    if (prompt) {
+      directorAI.processPrompt(prompt);
+      directorPromptInput.value = '';
+    }
+  });
+
+  document.querySelectorAll('.prompt-chip').forEach(chip => {
+    chip.addEventListener('click', () => directorAI.processPrompt(chip.dataset.cmd));
+  });
+
+  function applySettingsToUI(adj) {
+    if (adj.layoutMode !== undefined) updateLayoutFocusUI(adj.layoutMode);
     if (adj.topCropY !== undefined) {
       player.topCropY = adj.topCropY;
       topCropY.value = Math.round(adj.topCropY * 100);
@@ -331,168 +603,18 @@ document.addEventListener('DOMContentLoaded', () => {
       captionOffset.value = adj.captionOffset;
       lblCaptionOffset.textContent = (adj.captionOffset >= 0 ? `+${adj.captionOffset.toFixed(2)}s` : `${adj.captionOffset.toFixed(2)}s`);
     }
-    if (adj.highlightColor !== undefined) {
-      captionsEngine.setHighlightColor(adj.highlightColor);
-      document.getElementById('activeColorPreview').style.background = adj.highlightColor;
-      document.querySelectorAll('.color-swatch').forEach(s => {
-        s.classList.toggle('active', s.dataset.color.toLowerCase() === adj.highlightColor.toLowerCase());
-      });
-    }
-    if (adj.fontSize !== undefined) {
-      captionsEngine.setFontSize(adj.fontSize);
-      fontSize.value = adj.fontSize;
-      lblFontSize.textContent = `${adj.fontSize}px`;
-    }
     if (adj.hookText !== undefined) {
       captionsEngine.setHookText(adj.hookText);
       hookTextInput.value = adj.hookText;
     }
-    if (adj.gameplayPreset !== undefined) {
-      player.gameplayPreset = adj.gameplayPreset;
-      document.querySelectorAll('.gameplay-card').forEach(c => {
-        c.classList.toggle('active', c.dataset.gameplay === adj.gameplayPreset);
-      });
-    }
   }
 
   // -------------------------------------------------------------
-  // DIRECTOR CHAT & PROMPT FORM
+  // EXPORT SHORT ACTION
   // -------------------------------------------------------------
-  directorPromptForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const prompt = directorPromptInput.value;
-    if (prompt) {
-      directorAI.processPrompt(prompt);
-      directorPromptInput.value = '';
-    }
-  });
-
-  // Quick Prompt Chips
-  document.querySelectorAll('.prompt-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const cmd = chip.dataset.cmd;
-      directorAI.processPrompt(cmd);
-    });
-  });
-
-  // -------------------------------------------------------------
-  // SOURCE INGESTION & PRESETS
-  // -------------------------------------------------------------
-  btnFetchUrl.addEventListener('click', async () => {
-    const rawUrl = videoUrlInput.value.trim();
-    if (!rawUrl) return;
-
-    btnFetchUrl.disabled = true;
-    btnFetchUrl.innerHTML = '<span>⏳ Fetching...</span>';
-    directorAI.addChatMessage('system', '🌐 Link Ingestion', `Connecting to link: ${rawUrl}...`);
-
-    // 1. Direct Video Stream (.mp4, .webm, .mov, blob)
-    if (/\.(mp4|webm|mov|m4v)(\?.*)?$/i.test(rawUrl)) {
-      player.loadSpeakerMedia(rawUrl);
-      directorAI.addChatMessage('system', '✅ Video Stream Loaded', 'Loaded direct video stream into 9:16 player!');
-      btnFetchUrl.disabled = false;
-      btnFetchUrl.innerHTML = '<span>Fetch Video</span>';
-      return;
-    }
-
-    // 2. Try Local Server with installed yt-dlp first
-    try {
-      const resp = await fetch('/api/parse-url', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: rawUrl })
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        if (data.success && data.videoUrl && data.videoUrl.startsWith('http')) {
-          player.loadSpeakerMedia(data.videoUrl);
-          directorAI.addChatMessage('system', '✅ Stream Extracted', `Loaded "${data.title || 'Stream'}". Ready to trim and export!`);
-          btnFetchUrl.disabled = false;
-          btnFetchUrl.innerHTML = '<span>Fetch Video</span>';
-          return;
-        }
-      }
-    } catch (e) {
-      // Local server not running or static host
-    }
-
-    // 3. Fallback: Query Public Stream Extractors (Cobalt / Piped)
-    let streamFound = false;
-    const streamResolvers = [
-      'https://cobalt-api.kwiatekm.tokyo/api/json',
-      'https://api.cobalt.tools/api/json'
-    ];
-
-    for (const resolver of streamResolvers) {
-      try {
-        const cResp = await fetch(resolver, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({ url: rawUrl, vQuality: '720' })
-        });
-        if (cResp.ok) {
-          const cData = await cResp.json();
-          if (cData.url) {
-            player.loadSpeakerMedia(cData.url);
-            directorAI.addChatMessage('system', '🎉 Video Stream Ready', 'Extracted stream via cloud resolver. 9:16 Short is ready for editing!');
-            streamFound = true;
-            break;
-          }
-        }
-      } catch (err) {}
-    }
-
-    btnFetchUrl.disabled = false;
-    btnFetchUrl.innerHTML = '<span>Fetch Video</span>';
-
-    if (!streamFound) {
-      directorAI.addChatMessage('system', 'ℹ️ Stream Notice', 
-        `To clip directly from YouTube/Kick links on your PC without browser CORS limits, start the local server with the installed yt-dlp (\`node server/server.js\`), or drop your downloaded video file with "Upload Video File".`
-      );
-    }
-  });
-
-  localVideoUpload.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      player.loadSpeakerMedia(file);
-      directorAI.addChatMessage('system', '📁 File Loaded', `Loaded local video: ${file.name}. Speaker cropped in top half.`);
-    }
-  });
-
-  // Preset Chips
-  document.querySelectorAll('.preset-pills .chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('.preset-pills .chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      const preset = STREAM_PRESETS[chip.dataset.preset];
-      if (preset) {
-        player.loadPreset(preset);
-        updateTrimUI();
-        applySettingsToUI({
-          topCropY: preset.topCropY,
-          topCropX: preset.topCropX,
-          topZoom: preset.topZoom,
-          splitRatio: preset.splitRatio,
-          hookText: preset.hook
-        });
-        directorAI.addChatMessage('system', '⚡ Preset Switched', `Loaded "${preset.title}".`);
-      }
-    });
-  });
-
-  btnDemoStream.addEventListener('click', () => {
-    player.loadPreset(STREAM_PRESETS['tutorial-demo']);
-    updateTrimUI();
-    directorAI.addChatMessage('system', '⚡ Demo Stream', 'Loaded Creator Demo preset with 1080x1920 9:16 vertical layout.');
-  });
-
-  // -------------------------------------------------------------
-  // EXPORT ACTION & MODAL
-  // -------------------------------------------------------------
-  btnExportClip.addEventListener('click', () => {
-    exporter.exportShort();
-  });
+  btnExportClip.addEventListener('click', () => exporter.exportShort());
+  if (btnMobileStickyExport) btnMobileStickyExport.addEventListener('click', () => exporter.exportShort());
+  if (btnQuickExportTop) btnQuickExportTop.addEventListener('click', () => exporter.exportShort());
 
   function showExportSuccessModal(clipData) {
     modalClipFilename.textContent = clipData.filename;
@@ -510,11 +632,10 @@ document.addEventListener('DOMContentLoaded', () => {
   btnDirectorReEdit.addEventListener('click', () => {
     exportSuccessModal.style.display = 'none';
     modalVideoPlayer.pause();
-    directorPromptInput.focus();
   });
 
   // -------------------------------------------------------------
-  // CLIPS GALLERY LOADER
+  // CLIPS GALLERY
   // -------------------------------------------------------------
   async function loadClipsGallery() {
     try {
@@ -523,36 +644,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await resp.json();
         renderClipsGrid(data.clips || []);
       }
-    } catch (e) {
-      console.warn('Could not load clips from server:', e);
-    }
+    } catch (e) {}
   }
 
   function renderClipsGrid(clips) {
-    clipsCountBadge.textContent = clips.length;
-    galleryCountTag.textContent = `${clips.length} clip${clips.length === 1 ? '' : 's'} saved in /clips`;
+    galleryCountTag.textContent = `${clips.length} clip${clips.length === 1 ? '' : 's'} saved`;
 
-    if (clips.length === 0) {
-      clipsGrid.innerHTML = `
-        <div class="empty-clips-state">
-          <span class="empty-icon">🎬</span>
-          <p>No clips exported yet. Choose your moment above and click <b>"EXPORT SHORT"</b> to create <code>clip_01.mp4</code>!</p>
-        </div>
-      `;
-      exporter.setClipIndex(1);
-      return;
-    }
-
-    // Determine next index from existing clips
     let maxIdx = 0;
     clips.forEach(c => {
       const m = c.name.match(/clip_(\d+)\./);
-      if (m) {
-        const idx = parseInt(m[1], 10);
-        if (idx > maxIdx) maxIdx = idx;
-      }
+      if (m) maxIdx = Math.max(maxIdx, parseInt(m[1], 10));
     });
-    exporter.setClipIndex(maxIdx + 1);
+    const nextIdx = maxIdx + 1;
+    exporter.setClipIndex(nextIdx);
+    const padded = String(nextIdx).padStart(2, '0');
+    if (topClipName) topClipName.textContent = `clip_${padded}.mp4`;
+    if (exportSubFilename) exportSubFilename.textContent = `clip_${padded}.mp4`;
+
+    if (clips.length === 0) return;
 
     clipsGrid.innerHTML = clips.map(clip => `
       <div class="clip-card">
@@ -567,44 +676,14 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           <div class="clip-card-actions">
             <a href="${clip.path}" download="${clip.name}" class="btn btn-primary btn-xs" style="flex:1;">⬇️ Download</a>
-            <button class="btn btn-secondary btn-xs btn-card-play" data-src="${clip.path}">▶ Play</button>
           </div>
         </div>
       </div>
     `).join('');
-
-    // Wire play buttons on cards
-    document.querySelectorAll('.btn-card-play').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const card = e.target.closest('.clip-card');
-        const v = card.querySelector('video');
-        if (v.paused) {
-          v.play();
-          btn.textContent = '⏸ Pause';
-        } else {
-          v.pause();
-          btn.textContent = '▶ Play';
-        }
-      });
-    });
   }
 
   btnRefreshClips.addEventListener('click', loadClipsGallery);
-  document.getElementById('btnViewClips').addEventListener('click', () => {
-    document.getElementById('clipsGallerySection').scrollIntoView({ behavior: 'smooth' });
-  });
-
-  // Initial load of clips
   loadClipsGallery();
-
-  // Keyboard Shortcuts
-  window.addEventListener('keydown', (e) => {
-    // Space to Play/Pause when not typing
-    if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-      e.preventDefault();
-      btnPlayPause.click();
-    }
-  });
 
   function formatTime(seconds) {
     const s = Math.max(0, seconds || 0);

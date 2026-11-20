@@ -2,21 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ViralClips AI - 9:16 Viral Shorts Generator & AI Director</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#090B10">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>ViralClips AI - 9:16 Shorts Generator & Director Studio</title>
+  
+  <!-- Modern Fonts with Devanagari Hindi / Hinglish Support -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@700;800;900&family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@700;800;900&family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@800;900&family=Noto+Sans+Devanagari:wght@700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg-dark text-light antialiased">
+<body class="bg-dark text-light antialiased mobile-app-shell">
 
-  <!-- Top App Navigation Bar -->
+  <!-- Mobile & Desktop App Header -->
   <header class="app-header">
     <div class="header-container">
       <div class="brand">
         <div class="brand-logo">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M4 4H20V20H4V4Z" stroke="#FFE600" stroke-width="2" stroke-linejoin="round"/>
             <path d="M4 12H20" stroke="#FFE600" stroke-width="2"/>
             <path d="M10 4V20" stroke="#FFE600" stroke-width="1.5" stroke-dasharray="2 2"/>
@@ -25,90 +30,98 @@
         </div>
         <div class="brand-info">
           <span class="brand-title">VIRALCLIPS<span class="text-accent">.AI</span></span>
-          <span class="brand-badge">DIRECTOR STUDIO</span>
-        </div>
-      </div>
-
-      <div class="header-status">
-        <div class="status-pill">
-          <span class="status-dot pulsing"></span>
-          <span class="status-text">Format: <b>9:16 (1080×1920)</b></span>
-        </div>
-        <div class="status-pill">
-          <span class="icon">📁</span>
-          <span>Target: <code class="text-accent">/clips</code></span>
+          <span class="brand-badge">MOBILE STUDIO</span>
         </div>
       </div>
 
       <div class="header-actions">
-        <button id="btnDemoStream" class="btn btn-secondary btn-sm">
-          <span>⚡ Load Sample Stream</span>
+        <button id="btnDemoStream" class="btn btn-secondary btn-sm" title="Load High-Speed Demo">
+          <span>⚡ Demo</span>
         </button>
-        <button id="btnViewClips" class="btn btn-outline btn-sm">
-          <span>🎬 View Clips (<span id="clipsCountBadge">0</span>)</span>
+        <button id="btnQuickExportTop" class="btn btn-primary btn-sm btn-quick-export">
+          <span>⚡ Export (<span id="topClipName">clip_01.mp4</span>)</span>
         </button>
-        <a href="https://github.com" target="_blank" class="btn btn-github btn-sm">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          <span>GitHub</span>
-        </a>
       </div>
     </div>
   </header>
 
-  <!-- Main Application Body -->
-  <main class="app-main">
+  <!-- Main Mobile Application Container -->
+  <main class="app-main mobile-scroll-container">
 
-    <!-- Source Video Ingestion Bar -->
+    <!-- Section 1: Video Ingestion & YouTube Timestamp Parser Bar -->
     <section class="ingestion-section">
       <div class="ingestion-card">
         <div class="ingestion-input-group">
-          <div class="input-prefix">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
-          </div>
+          <div class="input-prefix">🔗</div>
           <input 
             type="text" 
             id="videoUrlInput" 
-            placeholder="Paste link from YouTube, Kick, Twitch, TikTok, or direct .mp4..."
-            value="https://www.youtube.com/watch?v=sample_viral_stream"
+            placeholder="Paste YouTube (with ?t=1m30s), Kick, TikTok or .mp4 link..."
+            value=""
           >
-          <button id="btnFetchUrl" class="btn btn-primary">
+          <button id="btnFetchUrl" class="btn btn-primary btn-fetch">
             <span>Fetch Video</span>
           </button>
         </div>
 
         <div class="ingestion-alternatives">
-          <span class="text-muted">Or import file:</span>
           <label class="btn-file-upload">
-            <input type="file" id="localVideoUpload" accept="video/mp4,video/webm,video/quicktime" hidden>
-            <span>📁 Upload Video File</span>
+            <input type="file" id="localVideoUpload" accept="video/mp4,video/webm,video/quicktime,video/mkv" hidden>
+            <span>📁 Upload from Phone/PC</span>
           </label>
 
           <div class="preset-pills">
-            <span class="pill-label">Sample Presets:</span>
-            <button class="chip active" data-preset="tutorial-demo">⚡ Creator Demo</button>
-            <button class="chip" data-preset="developer-talk">⚙️ Developer Log</button>
+            <span class="pill-label">Presets:</span>
+            <button class="chip active" data-preset="tutorial-demo">⚡ Hinglish Demo</button>
+            <button class="chip" data-preset="developer-talk">⚙️ Gaming Demo</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Studio Layout: Preview on Left, Director AI on Right -->
-    <section class="studio-workspace">
+    <!-- Section 2: Mobile App Navigation Tabs (CapCut / InShot Style) -->
+    <nav class="mobile-tab-bar" id="mobileTabBar">
+      <button class="m-tab-btn active" data-section="secPreview">
+        <span class="m-tab-icon">📱</span>
+        <span class="m-tab-label">Preview</span>
+      </button>
+      <button class="m-tab-btn" data-section="secTiming">
+        <span class="m-tab-icon">✂️</span>
+        <span class="m-tab-label">Trim & Cut</span>
+      </button>
+      <button class="m-tab-btn" data-section="secLayout">
+        <span class="m-tab-icon">📐</span>
+        <span class="m-tab-label">Focus Mode</span>
+      </button>
+      <button class="m-tab-btn" data-section="secCaptions">
+        <span class="m-tab-icon">💬</span>
+        <span class="m-tab-label">Hinglish Captions</span>
+      </button>
+      <button class="m-tab-btn" data-section="secDirector">
+        <span class="m-tab-icon">🎬</span>
+        <span class="m-tab-label">AI Director</span>
+      </button>
+    </nav>
 
-      <!-- LEFT: The 9:16 Interactive Short Previewer -->
-      <div class="preview-column">
+    <!-- Studio Grid / Mobile View Sections -->
+    <div class="studio-workspace mobile-sections-wrapper">
+
+      <!-- ========================================================
+           TAB 1: 9:16 PREVIEW & FAST ACTION
+           ======================================================== -->
+      <div class="preview-column app-section-card active" id="secPreview">
         <div class="preview-container">
           
-          <!-- Layout Mode Switcher (Split, Gameplay Only, Face Only) -->
+          <!-- Layout Quick Switcher on Top of Video -->
           <div class="layout-mode-selector" id="layoutModeSelector">
-            <button class="layout-mode-btn active" data-layout="split" title="50% Speaker Facecam top + 50% Gameplay bottom">
+            <button class="layout-mode-btn active" data-layout="split" title="50% Speaker Face + 50% Gameplay">
               <span class="icon">🔀</span> Split (50/50)
             </button>
-            <button class="layout-mode-btn" data-layout="gameplay-only" title="Full 9:16 Gameplay Shorts (No Facecam)">
-              <span class="icon">🎮</span> Gameplay Only
+            <button class="layout-mode-btn" data-layout="gameplay-only" title="100% Fullscreen Gameplay Shorts (No Facecam)">
+              <span class="icon">🎮</span> Only Gameplay
             </button>
-            <button class="layout-mode-btn" data-layout="face-only" title="Full 9:16 Speaker / Facecam">
-              <span class="icon">🎙️</span> Face Only
+            <button class="layout-mode-btn" data-layout="face-only" title="100% Fullscreen Speaker / Facecam">
+              <span class="icon">🎙️</span> Only Face
             </button>
           </div>
 
@@ -130,286 +143,392 @@
                 </div>
               </div>
 
-              <!-- Master 9:16 Composition Canvas (Renders final 1080x1920) -->
+              <!-- Master 9:16 Composition Canvas (Renders 1080x1920) -->
               <canvas id="compositionCanvas" width="1080" height="1920"></canvas>
 
-              <!-- Video Source Elements (Hidden, drawn onto canvas) -->
+              <!-- Video Source Elements -->
               <video id="speakerVideo" playsinline crossOrigin="anonymous" loop></video>
               <video id="gameplayVideo" playsinline crossOrigin="anonymous" loop muted></video>
             </div>
 
-            <!-- Resolution & Framerate Specs Badge -->
             <div class="viewport-specs">
-              <span>9:16 VERTICAL SHORT</span>
+              <span id="vpFormatBadge">9:16 VERTICAL SHORT</span>
               <span>1080 × 1920 @ 60FPS</span>
             </div>
           </div>
 
-          <!-- Video Playback & Moment Trim Controls -->
+          <!-- Video Playback & Quick Scrubber -->
           <div class="player-controls-bar">
             <div class="transport-buttons">
-              <button id="btnPlayPause" class="btn btn-icon btn-accent" title="Play/Pause (Space)">
+              <button id="btnPlayPause" class="btn btn-icon btn-accent" title="Play/Pause">
                 <span id="playIcon">▶</span>
               </button>
               <div class="time-display">
-                <span id="currentTimeText">00:00.0</span> / <span id="totalDurationText">00:30.0</span>
+                <span id="currentTimeText">00:00.0</span> / <span id="totalDurationText">00:15.0</span>
               </div>
+              <div class="clip-duration-tag" id="clipDurationTag">Clip: 15.0s</div>
             </div>
 
-            <!-- Moment Scrubber & Trim Range -->
+            <!-- Scrubber -->
             <div class="scrubber-wrapper">
               <input type="range" id="timelineScrubber" min="0" max="30" step="0.05" value="0">
               <div class="moment-trim-indicator" id="momentTrimBar" style="left: 0%; width: 100%;"></div>
             </div>
-
-            <div class="trim-actions">
-              <label class="trim-label">Trim Moment:</label>
-              <input type="number" id="trimStart" class="input-num" value="0.0" step="0.5" min="0">s -
-              <input type="number" id="trimEnd" class="input-num" value="30.0" step="0.5">s
-            </div>
           </div>
 
         </div>
       </div>
 
-      <!-- RIGHT: The AI Director & Editor Panel -->
-      <div class="director-column">
-
-        <!-- Card 1: AI Director Feedback Loop (The requested prompt-based fixer) -->
-        <div class="director-card highlight-card">
-          <div class="card-header">
-            <div class="header-with-badge">
-              <div class="director-avatar">🎬</div>
-              <div>
-                <h3 class="card-title">AI Director & Editor</h3>
-                <p class="card-subtitle">Natural language framing, zoom, sync adjustments & auto-export</p>
-              </div>
-            </div>
-            <span class="ai-status-pulse">Active</span>
-          </div>
-
-          <!-- Director Interactive Chat Stream -->
-          <div class="director-chat-box" id="directorChatLogs">
-            <div class="chat-message system">
-              <span class="chat-sender">🤖 Director AI:</span>
-              <span class="chat-text">Welcome! I've calibrated the 9:16 layout: Speaker cropped in top half, gameplay muted in bottom half, yellow karaoke captions, and a 2-second viral hook. Notice anything off? Tell me below and I'll adjust & re-export!</span>
-            </div>
-          </div>
-
-          <!-- Quick Suggestion Buttons -->
-          <div class="director-prompts-tray">
-            <button class="prompt-chip" data-cmd="Face cut off on top, move down 15%">📐 Face cut off, shift down</button>
-            <button class="prompt-chip" data-cmd="Captions are late by 0.4s, sync with voice">⏱️ Captions late, speed up</button>
-            <button class="prompt-chip" data-cmd="Zoom in on face 20%">🔍 Zoom in on face</button>
-            <button class="prompt-chip" data-cmd="Change hook to: THIS BROKE THE INTERNET 💀">🔥 Change hook text</button>
-            <button class="prompt-chip" data-cmd="Switch gameplay to 3D Speed Runner">🎮 3D Runner BG</button>
-            <button class="prompt-chip" data-cmd="Looks great! Re-export clip_01.mp4 now">⚡ Fix & Re-export now</button>
-          </div>
-
-          <!-- Natural Language Command Input -->
-          <form id="directorPromptForm" class="director-input-form">
-            <div class="director-input-wrapper">
-              <input 
-                type="text" 
-                id="directorPromptInput" 
-                placeholder="E.g. 'Face cut off, move down 10%' or 'Captions late by 0.3s'..."
-                autocomplete="off"
-              >
-              <button type="submit" class="btn btn-primary" id="btnSendPrompt">
-                <span>Fix & Apply</span>
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <!-- Card 2: Manual Precision Sliders & Configuration Tabs -->
-        <div class="director-card">
-          <div class="tabs-nav">
-            <button class="tab-btn active" data-tab="tabFraming">📐 1. Split Layout</button>
-            <button class="tab-btn" data-tab="tabCaptions">💬 2. Karaoke Captions</button>
-            <button class="tab-btn" data-tab="tabHook">🎯 3. 2s Hook</button>
-            <button class="tab-btn" data-tab="tabGameplay">🎮 4. Gameplay BG</button>
-          </div>
-
-          <div class="tab-content active" id="tabFraming">
-            <div class="control-grid">
-              <div class="control-item">
-                <label>Short Layout Format:</label>
-                <div class="layout-mode-selector mini">
-                  <button class="layout-mode-btn active" data-layout="split">🔀 Split (50/50)</button>
-                  <button class="layout-mode-btn" data-layout="gameplay-only">🎮 Gameplay Only</button>
-                  <button class="layout-mode-btn" data-layout="face-only">🎙️ Face Only</button>
-                </div>
-                <div class="layout-hint-text" id="layoutHintText">Speaker on top 50% + Muted gameplay on bottom 50%</div>
-              </div>
-
-              <div class="control-item framing-speaker-control" id="ctrlTopCropY">
-                <div class="control-label-row">
-                  <label>Top Half: Speaker Vertical Position (Y)</label>
-                  <span id="lblTopCropY" class="control-val">20%</span>
-                </div>
-                <input type="range" id="topCropY" min="0" max="100" value="20" class="slider">
-              </div>
-
-              <div class="control-item">
-                <div class="control-label-row">
-                  <label>Top Half: Speaker Horizontal Position (X)</label>
-                  <span id="lblTopCropX" class="control-val">50%</span>
-                </div>
-                <input type="range" id="topCropX" min="0" max="100" value="50" class="slider">
-              </div>
-
-              <div class="control-item">
-                <div class="control-label-row">
-                  <label>Speaker Zoom / Scale</label>
-                  <span id="lblTopZoom" class="control-val">1.0x</span>
-                </div>
-                <input type="range" id="topZoom" min="80" max="250" value="100" class="slider">
-              </div>
-
-              <div class="control-item">
-                <div class="control-label-row">
-                  <label>Split Ratio (Top Speaker / Bottom Gameplay)</label>
-                  <span id="lblSplitRatio" class="control-val">50 / 50</span>
-                </div>
-                <input type="range" id="splitRatio" min="30" max="70" value="50" class="slider">
-              </div>
-            </div>
-          </div>
-
-          <div class="tab-content" id="tabCaptions">
-            <div class="control-grid">
-              <div class="control-item">
-                <div class="control-label-row">
-                  <label>Caption Timing Offset (Sync with voice)</label>
-                  <span id="lblCaptionOffset" class="control-val">0.00s</span>
-                </div>
-                <div class="offset-buttons-row">
-                  <button class="btn btn-xs btn-outline" id="btnOffsetMinus02">-0.2s</button>
-                  <input type="range" id="captionOffset" min="-2.0" max="2.0" step="0.05" value="0.0" class="slider">
-                  <button class="btn btn-xs btn-outline" id="btnOffsetPlus02">+0.2s</button>
-                </div>
-              </div>
-
-              <div class="control-item">
-                <div class="control-label-row">
-                  <label>Active Spoken Word Color</label>
-                  <span class="color-preview-box" id="activeColorPreview" style="background: #FFE600;"></span>
-                </div>
-                <div class="color-palette-picker">
-                  <button class="color-swatch active" data-color="#FFE600" style="background: #FFE600;" title="Viral Yellow"></button>
-                  <button class="color-swatch" data-color="#00FF66" style="background: #00FF66;" title="Neon Green"></button>
-                  <button class="color-swatch" data-color="#00F0FF" style="background: #00F0FF;" title="Electric Cyan"></button>
-                  <button class="color-swatch" data-color="#FF3366" style="background: #FF3366;" title="Hot Pink"></button>
-                  <button class="color-swatch" data-color="#FFAA00" style="background: #FFAA00;" title="Orange Flame"></button>
-                </div>
-              </div>
-
-              <div class="control-item">
-                <div class="control-label-row">
-                  <label>Caption Font Size</label>
-                  <span id="lblFontSize" class="control-val">42px</span>
-                </div>
-                <input type="range" id="fontSize" min="28" max="64" value="42" class="slider">
-              </div>
-
-              <div class="control-item">
-                <div class="control-label-row">
-                  <label>Caption Vertical Placement</label>
-                  <span id="lblCaptionY" class="control-val">Center Split</span>
-                </div>
-                <input type="range" id="captionY" min="30" max="85" value="50" class="slider">
-              </div>
-            </div>
-          </div>
-
-          <div class="tab-content" id="tabHook">
-            <div class="control-grid">
-              <div class="control-item">
-                <label>Top Hook Text (Displays for first 2.0s):</label>
-                <input type="text" id="hookTextInput" class="text-input" value="HE ACTUALLY SAID THIS?! 😱">
-              </div>
-              <div class="hook-preset-list">
-                <button class="chip chip-sm" data-hook="WAIT TILL THE END 💀">💀 WAIT TILL THE END</button>
-                <button class="chip chip-sm" data-hook="BRO WAS NOT READY 😭">😭 BRO WAS NOT READY</button>
-                <button class="chip chip-sm" data-hook="HE CANNOT BE SERIOUS 🤯">🤯 HE CANNOT BE SERIOUS</button>
-                <button class="chip chip-sm" data-hook="INSTANT KARMA CAUGHT ON STREAM">⚡ INSTANT KARMA</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="tab-content" id="tabGameplay">
-            <div class="control-grid">
-              <label>Select Bottom Half Gameplay Background (Muted):</label>
-              <div class="gameplay-selector-grid">
-                <div class="gameplay-card active" data-gameplay="runner">
-                  <div class="gameplay-thumb subway-thumb"></div>
-                  <span class="gameplay-title">3D Speed Runner</span>
-                </div>
-                <div class="gameplay-card" data-gameplay="parkour">
-                  <div class="gameplay-thumb minecraft-thumb"></div>
-                  <span class="gameplay-title">Voxel Parkour</span>
-                </div>
-                <div class="gameplay-card" data-gameplay="stunt">
-                  <div class="gameplay-thumb gta-thumb"></div>
-                  <span class="gameplay-title">Neon Stunt Ramp</span>
-                </div>
-                <div class="gameplay-card" data-gameplay="original">
-                  <div class="gameplay-thumb stream-thumb"></div>
-                  <span class="gameplay-title">Original Stream (Muted)</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 3: Instant Export Action & Status Card -->
-        <div class="director-card export-card">
-          <div class="export-header-row">
+      <!-- ========================================================
+           TAB 2: EXACT TIMESTAMP CUTTER & DURATION PRESETS
+           ======================================================== -->
+      <div class="director-card app-section-card" id="secTiming">
+        <div class="card-header">
+          <div class="header-with-badge">
+            <span class="section-icon">✂️</span>
             <div>
-              <div class="export-title">Export 9:16 Viral Short</div>
-              <div class="export-sub">Saves automatically to <code class="text-accent">/clips/clip_01.mp4</code></div>
+              <h3 class="card-title">YouTube Timestamp & Clip Cutter</h3>
+              <p class="card-subtitle">Set exact start and end time (MM:SS) or choose viral duration</p>
             </div>
-            <div class="next-clip-badge" id="nextClipNameBadge">clip_01.mp4</div>
+          </div>
+        </div>
+
+        <!-- Duration Presets (15s, 30s, 60s) -->
+        <div class="timing-presets-row">
+          <span class="timing-label">Target Duration:</span>
+          <div class="duration-buttons">
+            <button class="btn btn-secondary btn-sm dur-preset-btn active" data-dur="15">⚡ 15s Short</button>
+            <button class="btn btn-secondary btn-sm dur-preset-btn" data-dur="30">🔥 30s Viral</button>
+            <button class="btn btn-secondary btn-sm dur-preset-btn" data-dur="45">⏱️ 45s Deep</button>
+            <button class="btn btn-secondary btn-sm dur-preset-btn" data-dur="60">📱 60s Reel</button>
+          </div>
+        </div>
+
+        <!-- Start Time & End Time Controls with Increment/Decrement -->
+        <div class="timestamp-stepper-grid">
+          
+          <!-- Start Time Box -->
+          <div class="timestamp-card">
+            <label class="ts-label">Start Time (From)</label>
+            <div class="ts-input-stepper">
+              <button class="btn btn-xs btn-outline ts-btn" id="btnStartMinus5">-5s</button>
+              <button class="btn btn-xs btn-outline ts-btn" id="btnStartMinus1">-1s</button>
+              <input type="text" id="timeFormattedStart" class="input-time-box" value="00:00.0" placeholder="MM:SS.s">
+              <button class="btn btn-xs btn-outline ts-btn" id="btnStartPlus1">+1s</button>
+              <button class="btn btn-xs btn-outline ts-btn" id="btnStartPlus5">+5s</button>
+            </div>
+            <input type="range" id="sliderTrimStart" class="slider" min="0" max="60" step="0.5" value="0">
           </div>
 
-          <div class="export-progress-bar-container" id="exportProgressContainer" style="display: none;">
-            <div class="export-progress-fill" id="exportProgressBar" style="width: 0%;"></div>
-            <span class="export-progress-text" id="exportProgressText">Encoding 9:16 Short...</span>
+          <!-- End Time Box -->
+          <div class="timestamp-card">
+            <label class="ts-label">End Time (To)</label>
+            <div class="ts-input-stepper">
+              <button class="btn btn-xs btn-outline ts-btn" id="btnEndMinus5">-5s</button>
+              <button class="btn btn-xs btn-outline ts-btn" id="btnEndMinus1">-1s</button>
+              <input type="text" id="timeFormattedEnd" class="input-time-box" value="00:15.0" placeholder="MM:SS.s">
+              <button class="btn btn-xs btn-outline ts-btn" id="btnEndPlus1">+1s</button>
+              <button class="btn btn-xs btn-outline ts-btn" id="btnEndPlus5">+5s</button>
+            </div>
+            <input type="range" id="sliderTrimEnd" class="slider" min="0" max="60" step="0.5" value="15">
           </div>
 
-          <div class="export-btn-group">
-            <button id="btnExportClip" class="btn btn-export">
-              <span class="btn-icon">⚡</span>
-              <span class="btn-text">EXPORT SHORT TO /CLIPS</span>
+        </div>
+
+        <!-- Hidden numeric seconds inputs synced with steppers -->
+        <input type="hidden" id="trimStart" value="0.0">
+        <input type="hidden" id="trimEnd" value="15.0">
+
+        <div class="timestamp-helper-info">
+          💡 <b>Tip:</b> If your YouTube link has <code>?t=1m25s</code>, we automatically set your start time to 01:25!
+        </div>
+      </div>
+
+      <!-- ========================================================
+           TAB 3: FOCUS MODE (ONLY FACE / ONLY GAMEPLAY / SPLIT)
+           ======================================================== -->
+      <div class="director-card app-section-card" id="secLayout">
+        <div class="card-header">
+          <div class="header-with-badge">
+            <span class="section-icon">📐</span>
+            <div>
+              <h3 class="card-title">Camera & Focus Mode</h3>
+              <p class="card-subtitle">Choose what to focus on: Only Face, Only Gameplay, or 50/50 Split</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 Big Cards for Selection -->
+        <div class="focus-modes-grid">
+          
+          <!-- Mode 1: Only Face -->
+          <div class="focus-card" data-focus="face-only">
+            <div class="focus-card-icon">🎙️</div>
+            <div class="focus-card-title">Only Facecam</div>
+            <div class="focus-card-desc">100% Fullscreen vertical focus on the speaker. Gameplay is completely removed.</div>
+          </div>
+
+          <!-- Mode 2: Only Gameplay -->
+          <div class="focus-card" data-focus="gameplay-only">
+            <div class="focus-card-icon">🎮</div>
+            <div class="focus-card-title">Only Gameplay</div>
+            <div class="focus-card-desc">100% Fullscreen vertical action. Facecam is completely removed.</div>
+          </div>
+
+          <!-- Mode 3: Split 50/50 -->
+          <div class="focus-card active" data-focus="split">
+            <div class="focus-card-icon">🔀</div>
+            <div class="focus-card-title">Split Screen (50/50)</div>
+            <div class="focus-card-desc">Speaker cropped on top half, muted gameplay b-roll on bottom half.</div>
+          </div>
+
+        </div>
+
+        <!-- Precision Sliders for Face/Speaker Focus -->
+        <div class="framing-speaker-controls-card">
+          <h4 class="subcard-title">Facecam Auto-Focus & Position</h4>
+          <div class="control-grid">
+            <div class="control-item">
+              <div class="control-label-row">
+                <label>Face Vertical Position (Y)</label>
+                <span id="lblTopCropY" class="control-val">20%</span>
+              </div>
+              <input type="range" id="topCropY" min="0" max="100" value="20" class="slider">
+            </div>
+
+            <div class="control-item">
+              <div class="control-label-row">
+                <label>Face Horizontal Position (X)</label>
+                <span id="lblTopCropX" class="control-val">50%</span>
+              </div>
+              <input type="range" id="topCropX" min="0" max="100" value="50" class="slider">
+            </div>
+
+            <div class="control-item">
+              <div class="control-label-row">
+                <label>Face Zoom / Headshot Multiplier</label>
+                <span id="lblTopZoom" class="control-val">1.0x</span>
+              </div>
+              <input type="range" id="topZoom" min="80" max="250" value="100" class="slider">
+            </div>
+
+            <div class="control-item" id="splitRatioItem">
+              <div class="control-label-row">
+                <label>Split Ratio (Top / Bottom)</label>
+                <span id="lblSplitRatio" class="control-val">50 / 50</span>
+              </div>
+              <input type="range" id="splitRatio" min="30" max="70" value="50" class="slider">
+            </div>
+          </div>
+        </div>
+
+        <!-- Gameplay Background Selection -->
+        <div class="gameplay-select-wrapper">
+          <h4 class="subcard-title">Gameplay Action Style (Muted):</h4>
+          <div class="gameplay-selector-grid">
+            <div class="gameplay-card active" data-gameplay="runner">
+              <div class="gameplay-thumb subway-thumb"></div>
+              <span class="gameplay-title">3D Speed Runner</span>
+            </div>
+            <div class="gameplay-card" data-gameplay="parkour">
+              <div class="gameplay-thumb minecraft-thumb"></div>
+              <span class="gameplay-title">Voxel Parkour</span>
+            </div>
+            <div class="gameplay-card" data-gameplay="stunt">
+              <div class="gameplay-thumb gta-thumb"></div>
+              <span class="gameplay-title">Neon Mega Ramp</span>
+            </div>
+            <div class="gameplay-card" data-gameplay="original">
+              <div class="gameplay-thumb stream-thumb"></div>
+              <span class="gameplay-title">Original Stream (Muted)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ========================================================
+           TAB 4: MULTI-LANGUAGE HINGLISH KARAOKE CAPTIONS
+           ======================================================== -->
+      <div class="director-card app-section-card" id="secCaptions">
+        <div class="card-header">
+          <div class="header-with-badge">
+            <span class="section-icon">💬</span>
+            <div>
+              <h3 class="card-title">Multi-Language & Hinglish Captions</h3>
+              <p class="card-subtitle">Active word in Yellow. Type or edit any Hindi / Hinglish script!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Language Switcher Chips -->
+        <div class="caption-lang-selector">
+          <span class="timing-label">Language:</span>
+          <div class="duration-buttons">
+            <button class="btn btn-secondary btn-sm lang-btn active" data-lang="hinglish">🇮🇳 Hinglish</button>
+            <button class="btn btn-secondary btn-sm lang-btn" data-lang="hindi">हिंदी Hindi</button>
+            <button class="btn btn-secondary btn-sm lang-btn" data-lang="english">🇺🇸 English</button>
+          </div>
+        </div>
+
+        <!-- Quick Live Caption Script Editor (Fixes "Caption nahi aa rahe h") -->
+        <div class="caption-editor-card">
+          <div class="editor-header">
+            <label class="ts-label">Edit Caption Script (Auto Word-by-Word Karaoke):</label>
+            <button class="btn btn-xs btn-outline" id="btnAutoGenerateScript">✨ Auto-Generate Words</button>
+          </div>
+          <textarea id="captionScriptTextarea" class="caption-textarea" rows="3" placeholder="Type or paste dialogue here... e.g. Bhai ye kya bol diya tune sach me dekho aage"></textarea>
+          <button id="btnApplyCustomScript" class="btn btn-secondary btn-sm btn-block">
+            <span>Apply Word-by-Word Karaoke Captions</span>
+          </button>
+        </div>
+
+        <!-- Fine Tuning Controls -->
+        <div class="control-grid">
+          <div class="control-item">
+            <div class="control-label-row">
+              <label>Caption Audio Sync Delay</label>
+              <span id="lblCaptionOffset" class="control-val">0.00s</span>
+            </div>
+            <div class="offset-buttons-row">
+              <button class="btn btn-xs btn-outline" id="btnOffsetMinus02">-0.2s</button>
+              <input type="range" id="captionOffset" min="-2.0" max="2.0" step="0.05" value="0.0" class="slider">
+              <button class="btn btn-xs btn-outline" id="btnOffsetPlus02">+0.2s</button>
+            </div>
+          </div>
+
+          <div class="control-item">
+            <div class="control-label-row">
+              <label>Active Spoken Word Highlight</label>
+              <span class="color-preview-box" id="activeColorPreview" style="background: #FFE600;"></span>
+            </div>
+            <div class="color-palette-picker">
+              <button class="color-swatch active" data-color="#FFE600" style="background: #FFE600;" title="Viral Yellow"></button>
+              <button class="color-swatch" data-color="#00FF66" style="background: #00FF66;" title="Neon Green"></button>
+              <button class="color-swatch" data-color="#00F0FF" style="background: #00F0FF;" title="Electric Cyan"></button>
+              <button class="color-swatch" data-color="#FF3366" style="background: #FF3366;" title="Hot Pink"></button>
+            </div>
+          </div>
+
+          <!-- Top Hook Input -->
+          <div class="control-item">
+            <label>Top Viral Hook (Shows first 2 seconds):</label>
+            <input type="text" id="hookTextInput" class="text-input" value="WAIT FOR IT... 💀">
+            <div class="hook-preset-list">
+              <button class="chip chip-sm" data-hook="WAIT TILL THE END 💀">💀 WAIT TILL END</button>
+              <button class="chip chip-sm" data-hook="BHAI YE KYA HO GAYA 😭">😭 BHAI YE KYA HUA</button>
+              <button class="chip chip-sm" data-hook="BRO WAS NOT READY 🤯">🤯 NOT READY</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ========================================================
+           TAB 5: AI DIRECTOR & CHAT
+           ======================================================== -->
+      <div class="director-card app-section-card" id="secDirector">
+        <div class="card-header">
+          <div class="header-with-badge">
+            <div class="director-avatar">🎬</div>
+            <div>
+              <h3 class="card-title">AI Director & Editor</h3>
+              <p class="card-subtitle">Tell it in Hindi, Hinglish or English to fix framing or sync</p>
+            </div>
+          </div>
+          <span class="ai-status-pulse">Active</span>
+        </div>
+
+        <div class="director-chat-box" id="directorChatLogs">
+          <div class="chat-message system">
+            <span class="chat-sender">🤖 Director AI:</span>
+            <span class="chat-text">Ready! Tell me what to change (e.g. <i>"Face cut off shift down"</i>, <i>"Only gameplay"</i>, or <i>"Captions fast karo"</i>).</span>
+          </div>
+        </div>
+
+        <div class="director-prompts-tray">
+          <button class="prompt-chip" data-cmd="Switch to only gameplay shorts">🎮 Only Gameplay</button>
+          <button class="prompt-chip" data-cmd="Switch to only face shorts">🎙️ Only Facecam</button>
+          <button class="prompt-chip" data-cmd="Face cut off on top, move down 15%">📐 Face cut off, shift down</button>
+          <button class="prompt-cmd prompt-chip" data-cmd="Captions late by 0.3s">⏱️ Captions late, speed up</button>
+          <button class="prompt-chip" data-cmd="Looks great! Re-export clip_01.mp4 now">⚡ Fix & Re-export now</button>
+        </div>
+
+        <form id="directorPromptForm" class="director-input-form">
+          <div class="director-input-wrapper">
+            <input 
+              type="text" 
+              id="directorPromptInput" 
+              placeholder="e.g. 'Face cut off move down' or 'Only gameplay'..."
+              autocomplete="off"
+            >
+            <button type="submit" class="btn btn-primary" id="btnSendPrompt">
+              <span>Fix & Apply</span>
             </button>
           </div>
-        </div>
+        </form>
+      </div>
 
+    </div>
+
+    <!-- Export & Progress Card -->
+    <section class="director-card export-card">
+      <div class="export-header-row">
+        <div>
+          <div class="export-title">Export 9:16 Short</div>
+          <div class="export-sub">Saves as <code class="text-accent" id="exportSubFilename">clip_01.mp4</code></div>
+        </div>
+        <div class="next-clip-badge" id="nextClipNameBadge">clip_01.mp4</div>
+      </div>
+
+      <div class="export-progress-bar-container" id="exportProgressContainer" style="display: none;">
+        <div class="export-progress-fill" id="exportProgressBar" style="width: 0%;"></div>
+        <span class="export-progress-text" id="exportProgressText">Encoding 9:16 Short...</span>
+      </div>
+
+      <div class="export-btn-group">
+        <button id="btnExportClip" class="btn btn-export">
+          <span class="btn-icon">⚡</span>
+          <span class="btn-text">EXPORT SHORT (clip_01.mp4)</span>
+        </button>
       </div>
     </section>
 
-    <!-- Bottom Section: Saved Clips Gallery -->
+    <!-- Bottom Gallery: Saved Clips -->
     <section class="clips-gallery-section" id="clipsGallerySection">
       <div class="gallery-header">
         <div class="gallery-title-group">
           <h2>Exported Clips in <code class="text-accent">/clips</code></h2>
           <span class="gallery-count-tag" id="galleryCountTag">0 clips available</span>
         </div>
-        <button id="btnRefreshClips" class="btn btn-outline btn-sm">🔄 Refresh Gallery</button>
+        <button id="btnRefreshClips" class="btn btn-outline btn-sm">🔄 Refresh</button>
       </div>
 
       <div class="clips-grid" id="clipsGrid">
         <div class="empty-clips-state">
           <span class="empty-icon">🎬</span>
-          <p>No clips exported yet. Choose your moment above and click <b>"EXPORT SHORT"</b> to create <code>clip_01.mp4</code>!</p>
+          <p>No clips exported yet. Cut your timestamp moment above and tap <b>"EXPORT SHORT"</b> to create <code>clip_01.mp4</code>!</p>
         </div>
       </div>
     </section>
 
   </main>
 
-  <!-- Export Complete Modal Dialog -->
+  <!-- Sticky Bottom Bar for Mobile Native App Experience -->
+  <aside class="mobile-sticky-action-bar">
+    <button id="btnMobilePlayToggle" class="btn btn-icon btn-secondary">
+      <span id="mobilePlayIcon">▶</span>
+    </button>
+    <div class="mobile-sticky-info">
+      <span class="mobile-dur-text" id="mobileDurText">15.0s Short</span>
+      <span class="mobile-mode-text" id="mobileModeText">Split Mode</span>
+    </div>
+    <button id="btnMobileStickyExport" class="btn btn-primary btn-mobile-export">
+      <span>⚡ Export Short</span>
+    </button>
+  </aside>
+
+  <!-- Export Complete Modal -->
   <div class="modal-overlay" id="exportSuccessModal" style="display: none;">
     <div class="modal-dialog">
       <div class="modal-header">
@@ -420,19 +539,19 @@
         <button class="modal-close" id="btnCloseModal">&times;</button>
       </div>
       <div class="modal-body">
-        <p>Your 9:16 viral short has been rendered and saved directly into the project's <code class="text-accent">/clips</code> directory as <b id="modalClipFilename">clip_01.mp4</b>.</p>
+        <p>Your 9:16 viral short has been rendered and saved as <b id="modalClipFilename">clip_01.mp4</b>.</p>
         <div class="modal-video-preview">
           <video id="modalVideoPlayer" controls playsinline loop></video>
         </div>
       </div>
       <div class="modal-footer">
-        <button id="btnDirectorReEdit" class="btn btn-secondary">🎬 Tweak with AI Director</button>
+        <button id="btnDirectorReEdit" class="btn btn-secondary">🎬 Tweak with AI</button>
         <a id="btnDownloadClipDirect" href="#" download class="btn btn-primary">⬇️ Download File</a>
       </div>
     </div>
   </div>
 
-  <!-- JavaScript Modules -->
+  <!-- Scripts -->
   <script src="js/presets.js"></script>
   <script src="js/captions.js"></script>
   <script src="js/director.js"></script>
