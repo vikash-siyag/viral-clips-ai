@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  viral-clips-ai:
+    build: .
+    container_name: viralclips_studio
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount clips directory to host so exports persist on your machine
+      - ./clips:/app/clips
+    environment:
+      - PORT=3000
+    restart: unless-stopped

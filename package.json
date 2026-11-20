@@ -1,0 +1,28 @@
+{
+  "name": "viral-clips-ai",
+  "version": "1.0.0",
+  "description": "AI-powered viral short video editor from YouTube/Kick links. 9:16 layout, speaker top, gameplay bottom, karaoke yellow word captions, 2s hook, director chat feedback loop.",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node server/server.js",
+    "cli": "node scripts/export_cli.js"
+  },
+  "keywords": [
+    "viral-clips",
+    "shorts",
+    "tiktok",
+    "reels",
+    "ai-editor",
+    "karaoke-captions",
+    "youtube",
+    "kick",
+    "ffmpeg",
+    "content-creation"
+  ],
+  "author": "Antigravity AI Director",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

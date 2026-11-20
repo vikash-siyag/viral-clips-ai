@@ -1,0 +1,31 @@
+# Node dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment & API keys
+.env
+.env.local
+.env.*.local
+
+# Temp media files (don't commit raw video downloads or huge exports)
+temp/
+downloads/
+cache/
+*.mp4
+*.webm
+*.mov
+*.mkv
+!public/assets/**/*.mp4
+!public/assets/**/*.webm
+
+# Keep the clips directory tracked, but ignore exported videos inside it
+clips/*
+!clips/.gitkeep
+
+# System & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
